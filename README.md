@@ -7,7 +7,7 @@ npm i lil-orm
 ```
 
 # Define Entity
-```
+```javascript
 @Entity('user')
 class UserEntity {
   @PrimaryKey({
@@ -59,7 +59,7 @@ supported types:
  - JSON
 
 # Module Setup
-```
+```javascript
 import { LilORMModule } from 'lil-orm';
 
 const databaseConnectionString = ':memory:';
@@ -70,12 +70,12 @@ const module = new LilORM(databaseConnectionString);
 
 # Create Table
 (experimental API name)
-```
+```javascript
 module.createTable(UserEntity) //to create a table from an entity
 ```
 
 # CRUD Operations
-```
+```javascript
 //get repository for DAO
 const repository = module.getRepository<UserEntity>(UserEntity);
 
@@ -110,7 +110,7 @@ await repository.delete({ id: 69 });
 ```
 
 # Transactions
-```
+```javascript
 import { Transaction } from 'lil-orm';
 
 const repository = module.getRepository<UserEntity>(UserEntity);

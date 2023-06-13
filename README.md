@@ -1,3 +1,5 @@
+![ORM](https://github.com/scassius/lil-orm/assets/35706430/5fd46412-ea3d-40b8-a56a-20450e9e2986)
+
 # Lil ORM
 Lil ORM is a super lightweight SQLite ORM for Node.js. With its clear API, you can easily interact with SQLite databases
 

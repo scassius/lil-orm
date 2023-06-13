@@ -4,12 +4,12 @@
 Lil ORM is a super lightweight SQLite ORM for Node.js. With its clear API, you can easily interact with SQLite databases
 
 # Install 
-```
+```shell
 npm i lil-orm
 ```
 
 # Define Entity
-```javascript
+```typescript
 @Entity('user')
 class UserEntity {
   @PrimaryKey({
@@ -60,8 +60,49 @@ supported types:
  - DATE (ISO Format)
  - JSON
 
+ 
+⚠️ **Warning: Important Configuration Required**
+
+To ensure proper functioning of the library, please make sure to configure your TypeScript project correctly.
+
+**Option 1: Enable `useDefineForClassFields`**
+
+In your project's `tsconfig.json`, add or modify the `compilerOptions` section to include the following:
+
+```json
+{
+  "compilerOptions": {
+    "useDefineForClassFields": true
+  }
+}
+```
+**Option 2: Initialize Every Property with Default Values**
+
+If you cannot enable `useDefineForClassFields` or prefer not to modify your TypeScript configuration, make sure to explicitly initialize every property in your entity class with a default value.
+
+For example:
+
+```typescript
+@Entity('tableName')
+class MyEntity {
+  @PrimaryKey({
+    autoIncrement: true,
+  })
+  @Column({
+    type: 'INTEGER'
+  })
+  id: number = 0;
+  
+  @Column({
+    type: 'TEXT'
+  })
+  name: string = '';
+  // ...other properties
+}
+```
+
 # Module Setup
-```javascript
+```typescript
 import { LilORM } from 'lil-orm';
 
 const databaseConnectionString = ':memory:';
@@ -72,12 +113,12 @@ const module = new LilORM(databaseConnectionString);
 
 # Create Table
 (experimental API name)
-```javascript
+```typescript
 module.createTable(UserEntity) //to create a table from an entity
 ```
 
 # CRUD Operations
-```javascript
+```typescript
 //get repository for DAO
 const repository = module.getRepository<UserEntity>(UserEntity);
 
@@ -112,7 +153,7 @@ await repository.delete({ id: 69 });
 ```
 
 # Transactions
-```javascript
+```typescript
 import { Transaction } from 'lil-orm';
 
 const repository = module.getRepository<UserEntity>(UserEntity);

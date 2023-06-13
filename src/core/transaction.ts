@@ -1,6 +1,6 @@
 import { SQLiteDatabase } from './sqlite-database';
 
-export class Trasnaction {
+export class Transaction {
   private statemanets: string[];
 
   constructor(private readonly db: SQLiteDatabase) {}
@@ -25,7 +25,7 @@ export class Trasnaction {
     this.db.sqliteInstance.exec(this.statemanets.join(';'));
   }
 
-  transaction<T>(callback: (transaction: Trasnaction) => Promise<T>): Promise<T> {
+  transaction<T>(callback: (transaction: Transaction) => Promise<T>): Promise<T> {
     return new Promise(async (resolve, reject) => {
       this.begin();
       try {

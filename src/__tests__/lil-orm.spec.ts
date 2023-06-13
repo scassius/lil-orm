@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { Column, Entity, PrimaryKey } from '../core/decorators';
 import { LilORMModule } from '../core/module';
-import { Trasnaction } from '../core/transaction';
+import { Transaction } from '../core/transaction';
 
 @Entity('user')
 class UserEntity {
@@ -219,7 +219,7 @@ describe('LilORMModule', () => {
 
     const repository = module.getRepository<UserEntity>(UserEntity);
 
-    const transaction = new Trasnaction(repository.dbInstance);
+    const transaction = new Transaction(repository.dbInstance);
 
     transaction.transaction(async (transaction) => {
       repository.create(

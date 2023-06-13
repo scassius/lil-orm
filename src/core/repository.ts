@@ -3,7 +3,7 @@ import { escapeValue } from './helper';
 import { MetadataExtractor } from './metadata';
 import { QueryBuilder } from './query-builder';
 import { SQLiteDatabase } from './sqlite-database';
-import { Trasnaction } from './transaction';
+import { Transaction } from './transaction';
 
 export class Repository<TEntity> {
   private readonly tableName: string;
@@ -51,7 +51,7 @@ export class Repository<TEntity> {
     });
   }
 
-  create(entity: TEntity extends {} ? TEntity : any, transaction?: Trasnaction): Promise<void> {
+  create(entity: TEntity extends {} ? TEntity : any, transaction?: Transaction): Promise<void> {
     return new Promise((resolve, reject) => {
       const query = QueryBuilder.insertSql(entity as TEntity, this.entityModel);
       if (transaction) {
@@ -70,7 +70,7 @@ export class Repository<TEntity> {
     });
   }
 
-  update(entity: Partial<TEntity>, transaction?: Trasnaction): Promise<void> {
+  update(entity: Partial<TEntity>, transaction?: Transaction): Promise<void> {
     const entityClass = this.entityModel;
     return new Promise((resolve, reject) => {
       const query = QueryBuilder.updateSql(entity as TEntity, this.entityModel);
@@ -91,7 +91,7 @@ export class Repository<TEntity> {
     });
   }
 
-  delete(deletes: Partial<TEntity>, transaction?: Trasnaction): Promise<void> {
+  delete(deletes: Partial<TEntity>, transaction?: Transaction): Promise<void> {
     const entityClass = this.entityModel;
     return new Promise((resolve, reject) => {
       const pk = MetadataExtractor.getEntityPrimaryKey(new entityClass());

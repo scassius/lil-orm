@@ -1,0 +1,29 @@
+# Files and directories to exclude from the published package
+
+# Development files
+/.git
+/.github
+/.vscode
+/tests
+/docs
+/examples
+
+# Build output
+/dist
+/build
+
+# Configuration files
+.npmignore
+.eslintignore
+.babelrc
+.editorconfig
+
+# Source control files
+.gitignore
+.gitattributes
+
+# Miscellaneous
+*.log
+*.tmp
+*.bak
+*.swp

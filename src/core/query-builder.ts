@@ -95,7 +95,4 @@ export class QueryBuilder {
     return deleteQuery;
   }
 
-  static beginTrasaction() {
-    return '';
-  }
 }

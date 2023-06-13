@@ -62,7 +62,7 @@ supported types:
 
 # Module Setup
 ```javascript
-import { LilORMModule } from 'lil-orm';
+import { LilORM } from 'lil-orm';
 
 const databaseConnectionString = ':memory:';
 

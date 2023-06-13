@@ -1,43 +1,51 @@
-import "reflect-metadata";
+//import "reflect-metadata";
 import { Column, Entity, PrimaryKey } from "../core/decorators";
 import { LilORM } from "../";
 import { Transaction } from "../core/transaction";
 
+//@ts-ignore
 @Entity("user")
 class UserEntity {
+//@ts-ignore
   @PrimaryKey({
     autoIncrement: true,
   })
+//@ts-ignore
   @Column({
     type: "INTEGER",
     name: "id",
   })
   id: number;
 
-  @Column({
+//@ts-ignore
+  @Column({ 
     type: "TEXT",
     name: "name",
   })
   name: string;
 
+//@ts-ignore
   @Column({
     type: "TEXT",
     name: "email",
   })
   email: string;
 
+//@ts-ignore
   @Column({
     type: "JSON",
     name: "config",
   })
   config: any;
 
+//@ts-ignore
   @Column({
     type: "BOOLEAN",
     name: "is_active",
   })
   isActive: boolean;
 
+//@ts-ignore
   @Column({
     type: "DATE",
     name: "created_at",

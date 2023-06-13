@@ -12,11 +12,11 @@ export class QueryBuilder {
     if (!entityMetadata) {
       throw new Error("Entity metadata not found");
     }
-    const tableName = entityMetadata.name || entityClass.constructor.name;
+    const tableName = entityMetadata?.name || entityClass.constructor.name;
 
     const entityInstance = new entityClass();
     const columns: string[] = [];
-
+    
     const getColumnMetadata = (
       target: any,
       propertyKey: string | symbol

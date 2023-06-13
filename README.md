@@ -1,3 +1,5 @@
+![ORM](https://github.com/scassius/lil-orm/assets/35706430/5fd46412-ea3d-40b8-a56a-20450e9e2986)
+
 # Lil ORM
 Lil ORM is a super lightweight SQLite ORM for Node.js. With its clear API, you can easily interact with SQLite databases
 
@@ -7,7 +9,7 @@ npm i lil-orm
 ```
 
 # Define Entity
-```
+```javascript
 @Entity('user')
 class UserEntity {
   @PrimaryKey({
@@ -59,8 +61,8 @@ supported types:
  - JSON
 
 # Module Setup
-```
-import { LilORMModule } from 'lil-orm';
+```javascript
+import { LilORM } from 'lil-orm';
 
 const databaseConnectionString = ':memory:';
 
@@ -70,12 +72,12 @@ const module = new LilORM(databaseConnectionString);
 
 # Create Table
 (experimental API name)
-```
+```javascript
 module.createTable(UserEntity) //to create a table from an entity
 ```
 
 # CRUD Operations
-```
+```javascript
 //get repository for DAO
 const repository = module.getRepository<UserEntity>(UserEntity);
 
@@ -110,7 +112,7 @@ await repository.delete({ id: 69 });
 ```
 
 # Transactions
-```
+```javascript
 import { Transaction } from 'lil-orm';
 
 const repository = module.getRepository<UserEntity>(UserEntity);

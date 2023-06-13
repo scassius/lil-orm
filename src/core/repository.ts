@@ -1,16 +1,18 @@
-import { EntityTransformer } from './entity-transformer';
-import { escapeValue } from './helper';
-import { MetadataExtractor } from './metadata';
-import { QueryBuilder } from './query-builder';
-import { SQLiteDatabase } from './sqlite-database';
-import { Transaction } from './transaction';
+import { EntityTransformer } from "./entity-transformer";
+import { escapeValue } from "./helper";
+import { MetadataExtractor } from "./metadata";
+import { QueryBuilder } from "./query-builder";
+import { SQLiteDatabase } from "./sqlite-database";
+import { Transaction } from "./transaction";
 
 export class Repository<TEntity> {
   private readonly tableName: string;
 
   constructor(
-    private readonly entityModel: new () => TEntity extends object ? TEntity : any,
-    private readonly db: SQLiteDatabase,
+    private readonly entityModel: new () => TEntity extends object
+      ? TEntity
+      : any,
+    private readonly db: SQLiteDatabase
   ) {
     this.tableName = MetadataExtractor.getEntityTableName(entityModel);
   }
@@ -23,7 +25,7 @@ export class Repository<TEntity> {
     return new Promise(async (resolve, reject) => {
       const whereClause = Object.entries(conditions)
         .map(([key, value]) => `${key} = ${escapeValue(value)}`)
-        .join(' AND ');
+        .join(" AND ");
       const query = `SELECT * FROM ${this.tableName} WHERE ${whereClause}`;
       const res = await this.db.query<TEntity>(query, this.entityModel);
       resolve(res?.rows);
@@ -34,7 +36,7 @@ export class Repository<TEntity> {
     return new Promise(async (resolve, reject) => {
       const whereClause = Object.entries(conditions)
         .map(([key, value]) => `${key} = ${escapeValue(value)}`)
-        .join(' AND ');
+        .join(" AND ");
       const query = `SELECT * FROM ${this.tableName} WHERE ${whereClause}`;
       const res = await this.db.query<TEntity>(query, this.entityModel);
 
@@ -51,7 +53,10 @@ export class Repository<TEntity> {
     });
   }
 
-  create(entity: TEntity extends {} ? TEntity : any, transaction?: Transaction): Promise<void> {
+  create(
+    entity: TEntity extends {} ? TEntity : any,
+    transaction?: Transaction
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
       const query = QueryBuilder.insertSql(entity as TEntity, this.entityModel);
       if (transaction) {

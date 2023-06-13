@@ -1,93 +1,84 @@
-import 'reflect-metadata';
-import { Column, Entity, PrimaryKey } from '../core/decorators';
-import { LilORMModule } from '../core/module';
-import { Transaction } from '../core/transaction';
+import "reflect-metadata";
+import { Column, Entity, PrimaryKey } from "../core/decorators";
+import { LilORM } from "../";
+import { Transaction } from "../core/transaction";
 
-@Entity('user')
+@Entity("user")
 class UserEntity {
   @PrimaryKey({
     autoIncrement: true,
   })
   @Column({
-    type: 'INTEGER',
-    name: 'id',
+    type: "INTEGER",
+    name: "id",
   })
   id: number;
 
   @Column({
-    type: 'TEXT',
-    name: 'name',
+    type: "TEXT",
+    name: "name",
   })
   name: string;
 
   @Column({
-    type: 'TEXT',
-    name: 'email',
+    type: "TEXT",
+    name: "email",
   })
   email: string;
 
   @Column({
-    type: 'JSON',
-    name: 'config',
+    type: "JSON",
+    name: "config",
   })
   config: any;
 
   @Column({
-    type: 'BOOLEAN',
-    name: 'is_active',
+    type: "BOOLEAN",
+    name: "is_active",
   })
   isActive: boolean;
 
   @Column({
-    type: 'DATE',
-    name: 'created_at',
+    type: "DATE",
+    name: "created_at",
   })
   createdAt: Date;
 }
 
-describe('LilORMModule', () => {
-  const databaseConnectionString = ':memory:';
+describe("LilORM", () => {
+  const databaseConnectionString = ":memory:";
 
-  it('should instantiate LilORMModule', () => {
-    const module = new LilORMModule({
-      database: databaseConnectionString,
-      entities: [],
-    });
+  it("should instantiate LilORM", () => {
+    const module = new LilORM(databaseConnectionString);
 
     expect(module).toBeDefined();
   });
 
-  it('should migrate the database schema', async () => {
-    const module = new LilORMModule({
-      database: databaseConnectionString,
-      entities: [UserEntity],
-    });
+  it("should migrate the database schema", async () => {
+    const module = new LilORM(databaseConnectionString);
 
-    await module.migrate();
+    await module.createTable(UserEntity);
 
     // Assert that the migration was successful by checking if the table exists in the database
-    const tableExists = await module.tableExists('user');
+    const tableExists = await module.tableExists("user");
     expect(tableExists).toBeTruthy();
   });
 
-  it('should create a new user in the database', async () => {
+  it("should create a new user in the database", async () => {
     // Arrange
     // ... (Same code as in the original test)
 
-    const module = new LilORMModule({
-      database: databaseConnectionString,
-      entities: [UserEntity],
-    });
+    const module = new LilORM(databaseConnectionString);
 
-    await module.migrate();
+    await module.createTable(UserEntity);
 
     const repository = module.getRepository<UserEntity>(UserEntity);
 
     // Act
     await repository.create({
       id: 1,
-      email: 'test@gmail.com',
-      name: 'test',
+      email: "test@gmail.com",
+      name: "test",
       config: {
         test: true,
       },
@@ -98,30 +89,27 @@ describe('LilORMModule', () => {
     // Assert
     const user = await repository.findOne({ id: 1 });
     expect(user).toBeDefined();
-    expect(user?.email).toBe('test@gmail.com');
-    expect(user?.name).toBe('test');
+    expect(user?.email).toBe("test@gmail.com");
+    expect(user?.name).toBe("test");
     expect(user?.createdAt).toBeInstanceOf(Date);
     expect(user?.isActive).toBe(true);
     expect(user?.config).toEqual({ test: true });
   });
 
-  it('should retrieve all users from the database', async () => {
+  it("should retrieve all users from the database", async () => {
     // Arrange
     // ... (Same code as in the original test)
 
-    const module = new LilORMModule({
-      database: databaseConnectionString,
-      entities: [UserEntity],
-    });
+    const module = new LilORM(databaseConnectionString);
 
-    await module.migrate();
+    await module.createTable(UserEntity);
 
     const repository = module.getRepository<UserEntity>(UserEntity);
 
     await repository.create({
       id: 1,
-      email: 'test@gmail.com',
-      name: 'test',
+      email: "test@gmail.com",
+      name: "test",
       config: {
         test: true,
       },
@@ -134,27 +122,24 @@ describe('LilORMModule', () => {
 
     // Assert
     expect(users.length).toBe(1);
-    expect(users[0].email).toBe('test@gmail.com');
-    expect(users[0].name).toBe('test');
+    expect(users[0].email).toBe("test@gmail.com");
+    expect(users[0].name).toBe("test");
   });
 
-  it('should update a user in the database', async () => {
+  it("should update a user in the database", async () => {
     // Arrange
     // ... (Same code as in the original test)
 
-    const module = new LilORMModule({
-      database: databaseConnectionString,
-      entities: [UserEntity],
-    });
+    const module = new LilORM(databaseConnectionString);
 
-    await module.migrate();
+    await module.createTable(UserEntity);
 
     const repository = module.getRepository<UserEntity>(UserEntity);
 
     await repository.create({
       id: 1,
-      email: 'test@gmail.com',
-      name: 'test',
+      email: "test@gmail.com",
+      name: "test",
       config: {
         test: true,
       },
@@ -165,34 +150,31 @@ describe('LilORMModule', () => {
     // Act
     const updatedUser = {
       id: 1,
-      email: 'updated@gmail.com',
-      name: 'updated',
+      email: "updated@gmail.com",
+      name: "updated",
     };
     await repository.update(updatedUser);
 
     // Assert
     const user = await repository.findOne({ id: 1 });
-    expect(user?.email).toBe('updated@gmail.com');
-    expect(user?.name).toBe('updated');
+    expect(user?.email).toBe("updated@gmail.com");
+    expect(user?.name).toBe("updated");
   });
 
-  it('should delete a user from the database', async () => {
+  it("should delete a user from the database", async () => {
     // Arrange
     // ... (Same code as in the original test)
 
-    const module = new LilORMModule({
-      database: databaseConnectionString,
-      entities: [UserEntity],
-    });
+    const module = new LilORM(databaseConnectionString);
 
-    await module.migrate();
+    await module.createTable(UserEntity);
 
     const repository = module.getRepository<UserEntity>(UserEntity);
 
     await repository.create({
       id: 69,
-      email: 'test@gmail.com',
-      name: 'test',
+      email: "test@gmail.com",
+      name: "test",
       config: {
         test: true,
       },
@@ -209,13 +191,10 @@ describe('LilORMModule', () => {
     expect(user).toBeNull();
   });
 
-  it('should begin a transaction', async () => {
-    const module = new LilORMModule({
-      database: databaseConnectionString,
-      entities: [UserEntity],
-    });
+  it("should begin a transaction", async () => {
+    const module = new LilORM(databaseConnectionString);
 
-    await module.migrate();
+    await module.createTable(UserEntity);
 
     const repository = module.getRepository<UserEntity>(UserEntity);
 
@@ -225,15 +204,15 @@ describe('LilORMModule', () => {
       repository.create(
         {
           id: 1,
-          email: 'test@gmail.com',
-          name: 'test',
+          email: "test@gmail.com",
+          name: "test",
           config: {
             test: true,
           },
           isActive: true,
           createdAt: new Date(),
         },
-        transaction,
+        transaction
       );
       //throw new Error('test');
     });

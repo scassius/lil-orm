@@ -1,7 +1,11 @@
-import { COLUMN_METADATA_KEY, ENTITY_METADATA_KEY, PRIMARY_KEY_METADATA_KEY } from './constants';
-import { EntityTransformer } from './entity-transformer';
-import { ColumnMetadata, LilORMType, MapTypes, SQLiteType } from './types';
-import { TypesHelper } from './types-helper';
+import {
+  COLUMN_METADATA_KEY,
+  ENTITY_METADATA_KEY,
+  PRIMARY_KEY_METADATA_KEY,
+} from "./constants";
+import { EntityTransformer } from "./entity-transformer";
+import { ColumnMetadata, LilORMType, MapTypes, SQLiteType } from "./types";
+import { TypesHelper } from "./types-helper";
 
 export class MetadataExtractor {
   /**
@@ -11,7 +15,10 @@ export class MetadataExtractor {
    * @throws {Error} If the entity metadata or table name is not found.
    */
   static getEntityTableName(entityClass: any): string {
-    const entityMetadata = Reflect.getMetadata(ENTITY_METADATA_KEY, entityClass);
+    const entityMetadata = Reflect.getMetadata(
+      ENTITY_METADATA_KEY,
+      entityClass
+    );
     const tableName = entityMetadata.name;
     return tableName;
   }
@@ -22,18 +29,25 @@ export class MetadataExtractor {
    * @returns {Object} An object containing the property key and column name of the primary key.
    * @throws {Error} If the primary key metadata is not found.
    */
-  static getEntityPrimaryKey(entityInstance: any): { propertyKey: string; columnName: string } {
+  static getEntityPrimaryKey(entityInstance: any): {
+    propertyKey: string;
+    columnName: string;
+  } {
     const properties = Object.keys(entityInstance);
 
     for (const propertyKey of properties) {
-      const primaryKeyMetadata = Reflect.getMetadata(PRIMARY_KEY_METADATA_KEY, entityInstance, propertyKey);
+      const primaryKeyMetadata = Reflect.getMetadata(
+        PRIMARY_KEY_METADATA_KEY,
+        entityInstance,
+        propertyKey
+      );
       if (primaryKeyMetadata) {
         const columnName = primaryKeyMetadata.name || propertyKey.toString();
         return { propertyKey, columnName };
       }
     }
 
-    throw new Error('Primary key not found');
+    throw new Error("Primary key not found");
   }
 
   /**
@@ -46,7 +60,11 @@ export class MetadataExtractor {
     const properties = Object.keys(entityInstance);
 
     for (const propertyKey of properties) {
-      const columnMetadata = Reflect.getMetadata(COLUMN_METADATA_KEY, entityInstance, propertyKey);
+      const columnMetadata = Reflect.getMetadata(
+        COLUMN_METADATA_KEY,
+        entityInstance,
+        propertyKey
+      );
       if (columnMetadata) {
         const columnName = columnMetadata.name || propertyKey.toString();
         columns.push(columnName);
@@ -61,7 +79,11 @@ export class MetadataExtractor {
     const properties = Object.keys(entityInstance);
 
     for (const propertyKey of properties) {
-      const columnMetadata = Reflect.getMetadata(COLUMN_METADATA_KEY, entityInstance, propertyKey);
+      const columnMetadata = Reflect.getMetadata(
+        COLUMN_METADATA_KEY,
+        entityInstance,
+        propertyKey
+      );
       if (columnMetadata) {
         const columnName = columnMetadata.name || propertyKey.toString();
         columns.push({
@@ -85,10 +107,17 @@ export class MetadataExtractor {
     const properties = Object.keys(entityInstance);
 
     for (const propertyKey of properties) {
-      const columnMetadata = Reflect.getMetadata(COLUMN_METADATA_KEY, entityInstance, propertyKey);
+      const columnMetadata = Reflect.getMetadata(
+        COLUMN_METADATA_KEY,
+        entityInstance,
+        propertyKey
+      );
       if (columnMetadata) {
         const propertyValue = entityInstance[propertyKey];
-        const columnValue = EntityTransformer.formatValueToSQLiteType(propertyValue, columnMetadata.type);
+        const columnValue = EntityTransformer.formatValueToSQLiteType(
+          propertyValue,
+          columnMetadata.type
+        );
         values.push(columnValue);
       }
     }

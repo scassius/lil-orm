@@ -2,7 +2,7 @@ import { RADIX } from "./constants";
 
 export class TypesHelper {
   static isJSONObject(value: any): boolean {
-    return typeof value === 'object';
+    return typeof value === "object";
   }
 
   static isDate(value: any): boolean {
@@ -10,19 +10,21 @@ export class TypesHelper {
   }
 
   static isString(value: any): boolean {
-    return typeof value === 'string';
+    return typeof value === "string";
   }
 
   static isNumber(value: any): boolean {
-    return typeof value === 'number';
+    return typeof value === "number";
   }
 
   static isBoolean(value: any): boolean {
-    return typeof value === 'boolean';
+    return typeof value === "boolean";
   }
 
   static isUUID(value: any): boolean {
-    const regex = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$');
+    const regex = new RegExp(
+      "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    );
     return regex.test(value);
   }
 
@@ -35,7 +37,7 @@ export class TypesHelper {
   }
 
   static parseBoolean(value: any): boolean {
-    return value === 'true' || value === '1' || value === 1;
+    return value === "true" || value === "1" || value === 1;
   }
 
   static parseReal(value: any): number {
@@ -52,9 +54,9 @@ export class TypesHelper {
 
   /* tslint:disable:no-bitwise */
   static generateUUIDv4(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0;
-      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
       return v.toString(16);
     });
   }

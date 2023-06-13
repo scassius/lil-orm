@@ -64,21 +64,14 @@ import { LilORMModule } from 'lil-orm';
 
 const databaseConnectionString = ':memory:';
 
-const module = new LilORMModule({
-    database: databaseConnectionString,
-    entities: [UserEntity],
-});
+const module = new LilORM(databaseConnectionString);
 
 ```
 
-# Create Tables (Schema)
+# Create Table
 (experimental API name)
 ```
-module.migrate() //to create table of all defined entities
-```
-Or
-```
-module.migrateEntity<UserEntity>(UserEntity) //to create a table from an entity
+module.createTable(UserEntity) //to create a table from an entity
 ```
 
 # CRUD Operations

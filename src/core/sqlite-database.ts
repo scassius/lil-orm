@@ -1,6 +1,6 @@
-import * as sqlite3 from 'sqlite3';
-import { EntityTransformer } from './entity-transformer';
-import { EntityType } from './types';
+import * as sqlite3 from "sqlite3";
+import { EntityTransformer } from "./entity-transformer";
+import { EntityType } from "./types";
 
 export interface Result<T> {
   rows: T[];
@@ -39,7 +39,10 @@ export class SQLiteDatabase {
           resolve({
             rows: entityClass
               ? rows.map((row) => {
-                  return EntityTransformer.transformSQLEntityToObject(new entityClass(), row);
+                  return EntityTransformer.transformSQLEntityToObject(
+                    new entityClass(),
+                    row
+                  );
                 })
               : rows.map((row) => {
                   return row as T;

@@ -1,7 +1,7 @@
 {
   "name": "lil-orm",
-  "version": "0.1.0",
-  "description": "A sqlite3 ORM for Node.js",
+  "version": "0.1.1",
+  "description": "Lil ORM is a super lightweight SQLite ORM for Node.js. With its clear API, you can easily interact with SQLite databases.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

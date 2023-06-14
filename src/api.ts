@@ -44,4 +44,8 @@ export class LilORM {
     const res = await this.sqliteDatabase.query<{ name: string }>(query);
     return res.count > 0;
   }
+
+  get dbInstance() {
+    return this.sqliteDatabase;
+  }
 }

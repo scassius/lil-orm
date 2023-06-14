@@ -32,7 +32,7 @@ export class EntityTransformer {
     entityInstance: any
   ): ColumnMetadata[] {
     const columns =
-      MetadataExtractor.getEnrichedEntityColumnsName(entityInstance);
+      MetadataExtractor.getEnrichedEntityColumnsMetadata(entityInstance);
     columns
       .filter((col) => col.value !== undefined)
       .map((column) => {
@@ -47,6 +47,7 @@ export class EntityTransformer {
   }
 
   static valueQueryFormatter(value: any): string {
+    if (value === null) return `NULL`;
     if (TypesHelper.isString(value)) return `'${value}'`;
     if (TypesHelper.isDate(value)) return `'${value.toISOString()}'`;
     if (TypesHelper.isBoolean(value)) return value ? "1" : "0";

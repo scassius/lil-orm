@@ -3,6 +3,8 @@
 # Lil ORM
 Lil ORM is a super lightweight SQLite ORM for Node.js. With its clear API, you can easily interact with SQLite databases
 
+⚠️ **API are subjected to change** ⚠️ 
+
 # Install 
 ```shell
 npm i lil-orm

@@ -16,7 +16,7 @@ export class QueryBuilder {
 
     const entityInstance = new entityClass();
     const columns: string[] = [];
-    
+
     const getColumnMetadata = (
       target: any,
       propertyKey: string | symbol
@@ -42,10 +42,13 @@ export class QueryBuilder {
 
       if (propertyMetadata) {
         const columnName = propertyMetadata.name || propertyKey.toString();
+        const columnNotNull = propertyMetadata?.notNull || false;
         const columnType = MapTypes[propertyMetadata.type] as SQLiteType;
         const primaryKeyOptions = primaryKeyMetadata || {};
 
-        let columnDefinition = `${columnName} ${columnType}`;
+        let columnDefinition = `${columnName} ${columnType} ${
+          columnNotNull ? `NOT NULL` : ``
+        }`;
 
         if (primaryKeyOptions.autoIncrement) {
           columnDefinition += " PRIMARY KEY AUTOINCREMENT";

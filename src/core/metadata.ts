@@ -74,7 +74,9 @@ export class MetadataExtractor {
     return columns;
   }
 
-  static getEnrichedEntityColumnsName(entityInstance: any): ColumnMetadata[] {
+  static getEnrichedEntityColumnsMetadata(
+    entityInstance: any
+  ): ColumnMetadata[] {
     const columns: ColumnMetadata[] = [];
     const properties = Object.keys(entityInstance);
 

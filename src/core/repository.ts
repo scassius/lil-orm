@@ -1,7 +1,5 @@
 import { EntityTransformer } from "./entity-transformer";
-import { escapeValue } from "./helper";
-import { MetadataExtractor } from "./metadata";
-import { QueryBuilder } from "./query-builder";
+import { MetadataExtractor } from "./metadata/metadata-extractor";
 import { SQLiteDatabase } from "./sqlite-database";
 import { Transaction } from "./transaction";
 

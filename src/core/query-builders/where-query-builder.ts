@@ -1,23 +1,32 @@
-import { PropertyMapping, getPropertyMappings } from "./proprety-mapping";
+import { EntityTransformer } from "../entity-transformer";
+import { MetadataExtractor } from "../metadata/metadata-extractor";
+import { QueryBuilderAPI } from "./api-query-language";
+import { PropertyMapping, getPropertyMappings, valueQueryFormatter } from "./proprety-mapping";
 
 export class WhereQueryBuilder<T> {
+    private tableName: string;
     private propertyMappings: PropertyMapping<T>[];
 
-    constructor(entityClass: new () => T extends object ? T : any) {
+    constructor(entityClass: new () => T extends object ? T : any, private readonly queryBuilder?: QueryBuilderAPI) {
+        this.tableName = MetadataExtractor.getEntityTableName(entityClass);
         this.propertyMappings = getPropertyMappings(entityClass);
     }
 
-    where<K extends keyof T & string>(propertySelector: (entity: T) => K): QueryCondition<T, K> {
-        const propertyName = propertySelector((null as unknown) as T);
-        return new QueryCondition<T, K>(propertyName, this.propertyMappings);
+    where<K extends keyof T & string>(propertySelector: K): QueryCondition<T, K> {
+        const propertyName = propertySelector;
+        return new QueryCondition<T, K>(propertyName, this.propertyMappings, this.tableName);
+    }
+
+    void() {
+        return this.queryBuilder;
     }
 }
 
-export class QueryCondition<T, K extends keyof T & string> {
+export class QueryCondition<T, K extends keyof T> {
     private whereClauses: string[];
     private propertyMappings: PropertyMapping<T>[];
 
-    constructor(private readonly property: K, propertyMappings: PropertyMapping<T>[]) {
+    constructor(private readonly property: K, propertyMappings: PropertyMapping<T>[], private readonly tableName: string) {
         this.whereClauses = [];
         this.propertyMappings = propertyMappings;
     }
@@ -26,12 +35,19 @@ export class QueryCondition<T, K extends keyof T & string> {
         const mapping = this.propertyMappings.find(
             (mapping) => mapping.entityProperty === this.property
         );
-        return mapping ? mapping.columnName : String(this.property);
+        return `${this.tableName}.${mapping ? mapping.columnName : String(this.property)}`;
     }
 
     equals(value: T[K]): QueryCondition<T, K> {
         const columnName = this.getColumnName();
         this.whereClauses.push(`${columnName} = ${this.formatValue(value)}`);
+        return this;
+    }
+
+    like(value: string): QueryCondition<T, K> {
+        const columnName = this.getColumnName();
+        const formattedValue = this.formatValue(value);
+        this.whereClauses.push(`${columnName} LIKE ${formattedValue}`);
         return this;
     }
 
@@ -61,15 +77,10 @@ export class QueryCondition<T, K extends keyof T & string> {
     }
 
     private formatValue(value: any): string {
-        if (typeof value === "string") {
-            return `'${value}'`;
-        } else if (typeof value === "boolean") {
-            return value ? "1" : "0";
-        } else if (value instanceof Date) {
-            return `'${value.toISOString()}'`;
-        } else {
-            return String(value);
-        }
+        const type = this.propertyMappings.find(
+            (mapping) => mapping.entityProperty === this.property
+        )?.columnType || 'TEXT';
+        return valueQueryFormatter(EntityTransformer.formatValueToSQLiteType(value, type));
     }
 
     build(): string {

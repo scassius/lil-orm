@@ -1,5 +1,5 @@
-import { MetadataExtractor } from "./metadata";
-import { ColumnMetadata, LilORMType, MapTypes, SQLiteType } from "./types";
+import { MetadataExtractor } from "./metadata/metadata-extractor";
+import { ColumnMetadata, LilORMType, OrmTypesToSQLiteMap, SQLiteType } from "./types";
 import { TypesHelper } from "./types-helper";
 
 export class EntityTransformer {
@@ -40,7 +40,7 @@ export class EntityTransformer {
           column.value,
           column.type
         ) as SQLiteType;
-        column.type = MapTypes[column.type] as SQLiteType;
+        column.type = OrmTypesToSQLiteMap[column.type] as SQLiteType;
         return column;
       });
     return columns;
@@ -56,36 +56,29 @@ export class EntityTransformer {
     throw new Error("Not supported type");
   }
 
+  static get typeFormatters() {
+    return {
+      TEXT: (value: any) => (typeof value === 'string' ? `'${value}'` : String(value)),
+      INTEGER: (value: any) => (typeof value === 'boolean' ? value ? 1 : 0 : parseInt(value, 10)),
+      REAL: (value: any) => parseFloat(value),
+      JSON: (value: any) => JSON.parse(value),
+      BOOLEAN: (value: any) => Boolean(value),
+      DATE: (value: any) => new Date(value),
+      BLOB: (value: any) => value,
+      UUID: (value: any) => value
+    };
+  }
+
   static formatValue(value: any, type: LilORMType): any {
-    if (type === "TEXT" || type === "UUID" || type === "BLOB") {
-      if (TypesHelper.isDate(value)) return value.toISOString();
-      if (TypesHelper.isJSONObject(value)) return JSON.stringify(value);
-
-      return TypesHelper.parseString(value);
+    const formatter = EntityTransformer.typeFormatters[type];
+    if (formatter) {
+      return formatter(value);
     }
-    if (type === "INTEGER") {
-      if (TypesHelper.isBoolean(value)) return value ? 1 : 0;
-
-      return TypesHelper.parseInteger(value);
-    }
-    if (type === "REAL") {
-      return TypesHelper.parseReal(value);
-    }
-    if (type === "JSON") {
-      return TypesHelper.parseJson(value);
-    }
-    if (type === "BOOLEAN") {
-      return TypesHelper.parseBoolean(value);
-    }
-    if (type === "DATE") {
-      return TypesHelper.parseDate(value);
-    }
-
     return value;
   }
 
   static formatValueToSQLiteType(value: any, type: LilORMType): any {
-    const mappedType = MapTypes[type] as SQLiteType;
+    const mappedType = OrmTypesToSQLiteMap[type] as SQLiteType;
 
     return this.formatValue(value, mappedType);
   }

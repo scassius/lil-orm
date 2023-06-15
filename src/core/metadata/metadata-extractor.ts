@@ -3,10 +3,10 @@ import {
   ENTITY_METADATA_KEY,
   PRIMARY_KEY_METADATA_KEY,
 } from "./constants";
-import { ColumnOtps } from "./decorators";
-import { EntityTransformer } from "./entity-transformer";
-import { ColumnMetadata, LilORMType, MapTypes, SQLiteType } from "./types";
-import { TypesHelper } from "./types-helper";
+import { ColumnOtps } from "../decorators";
+import { EntityTransformer } from "../entity-transformer";
+import { ColumnMetadata, LilORMType, SQLiteType } from "../types";
+import { TypesHelper } from "../types-helper";
 
 export class MetadataExtractor {
   /**

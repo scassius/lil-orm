@@ -6,11 +6,11 @@ import { DataAccessLayer } from "./data-access-layer";
 import { QueryBuilderAPI } from "../query-builders/api-query-language";
 import { DatabaseConnection } from "../database/database-connection";
 import {
-  QueryCondition,
   WhereQueryBuilder,
 } from "../query-builders/where-query-builder";
 import { UpdateQueryBuilder } from "../query-builders/update-query-builder";
 import { DeleteQueryBuilder } from "../query-builders/delete-query-builder";
+import { QueryCondition } from "../query-builders/query-condition";
 
 export class Repository<TEntity> {
   private readonly _tableName: string;

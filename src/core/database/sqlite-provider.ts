@@ -1,6 +1,6 @@
 import * as sqlite3 from "sqlite3";
-import { EntityTransformer } from "./entity-transformer";
-import { EntityType } from "./types";
+import { EntityTransformer } from "../entity-transformer";
+import { EntityType } from "../types";
 
 export interface Result<T> {
   rows: T[];

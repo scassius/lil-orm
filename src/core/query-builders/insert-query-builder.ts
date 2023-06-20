@@ -1,31 +1,35 @@
 import { MetadataExtractor } from "../metadata/metadata-extractor";
+import { OperationType, QueryBuilderAPI } from "./api-query-language";
 
 export class InsertQueryBuilder<T> {
-    private values: Partial<T>;
 
-    constructor(private readonly entityClass: new () => T) {
-        this.values = {};
+    constructor(private readonly entityClass: new () => T extends object ? T : any, private readonly queryBuilder: QueryBuilderAPI) {
+        this.queryBuilder.forEntity(this.entityClass, OperationType.InsertInto)
+    }
+
+    finalize() {
+        return this.queryBuilder;
     }
 
     setObject(object: Partial<T>): InsertQueryBuilder<T> {
-        this.values = object;
+        const entityInstance = Object.assign(new this.entityClass(), object);
+        const values = MetadataExtractor.getEntityValues(entityInstance)
+        const columns: any[] = MetadataExtractor.getEntityColumnsName(entityInstance)
+    
+        let filteredValues: any[] = [];
+        let filteredColumns: any[] = [];
+        
+        for (let i = 0; i < values.length; i++) {
+            if (values[i] !== undefined && !Number.isNaN(values[i])) {
+                filteredValues.push(values[i]);
+                filteredColumns.push(columns[i]);
+            }
+        }
+    
+        this.queryBuilder.setValues(filteredValues);
+        this.queryBuilder.setColumns(filteredColumns);
+    
         return this;
     }
-
-    build(): string {
-        const entityName =  MetadataExtractor.getEntityTableName(this.entityClass);
-        const columns = Object.keys(this.values).join(", ");
-        const values = Object.values(this.values)
-            .map((value) => (typeof value === "string" ? `'${value}'` : value))
-            .join(", ");
-
-        return `INSERT INTO ${entityName} (${columns}) VALUES (${values})`;
-    }
+    
 }
-
-/**
- * const insertQuery = queryBuilder
-  .insertInto(UserEntity)
-  .setObject(user)
-  .build();
- */

@@ -1,3 +1,4 @@
+import { COLUMN_METADATA_KEY } from "./metadata/constants";
 import { MetadataExtractor } from "./metadata/metadata-extractor";
 import { ColumnMetadata, LilORMType, OrmTypesToSQLiteMap, SQLiteType } from "./types";
 import { TypesHelper } from "./types-helper";
@@ -12,7 +13,7 @@ export class EntityTransformer {
 
     for (const propertyKey of properties) {
       const columnMetadata = Reflect.getMetadata(
-        "column",
+        COLUMN_METADATA_KEY,
         entityInstance,
         propertyKey
       );
@@ -49,7 +50,7 @@ export class EntityTransformer {
   static valueQueryFormatter(value: any): string {
     if (value === null) return `NULL`;
     if (TypesHelper.isString(value)) return `'${value}'`;
-    if (TypesHelper.isDate(value)) return `'${value.toISOString()}'`;
+    if (TypesHelper.isDate(value)) return `'${(value as Date).toISOString()}'`;
     if (TypesHelper.isBoolean(value)) return value ? "1" : "0";
     if (TypesHelper.isNumber(value)) return value.toString();
     if (TypesHelper.isJSONObject(value)) return `'${JSON.stringify(value)}'`;
@@ -78,6 +79,7 @@ export class EntityTransformer {
   }
 
   static formatValueToSQLiteType(value: any, type: LilORMType): any {
+    if(value === undefined) return undefined;
     const mappedType = OrmTypesToSQLiteMap[type] as SQLiteType;
 
     return this.formatValue(value, mappedType);

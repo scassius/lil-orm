@@ -7,17 +7,17 @@ export class WhereQueryBuilder<T> {
     private tableName: string;
     private propertyMappings: PropertyMapping<T>[];
 
-    constructor(entityClass: new () => T extends object ? T : any, private readonly queryBuilder?: QueryBuilderAPI) {
+    constructor(entityClass: new () => T extends object ? T : any, private readonly queryBuilder: QueryBuilderAPI) {
         this.tableName = MetadataExtractor.getEntityTableName(entityClass);
         this.propertyMappings = getPropertyMappings(entityClass);
     }
 
     where<K extends keyof T & string>(propertySelector: K): QueryCondition<T, K> {
         const propertyName = propertySelector;
-        return new QueryCondition<T, K>(propertyName, this.propertyMappings, this.tableName);
+        return new QueryCondition<T, K>(propertyName, this.propertyMappings, this.tableName, this);
     }
 
-    void() {
+    finalize() {
         return this.queryBuilder;
     }
 }
@@ -26,7 +26,7 @@ export class QueryCondition<T, K extends keyof T> {
     private whereClauses: string[];
     private propertyMappings: PropertyMapping<T>[];
 
-    constructor(private readonly property: K, propertyMappings: PropertyMapping<T>[], private readonly tableName: string) {
+    constructor(private readonly property: K, propertyMappings: PropertyMapping<T>[], private readonly tableName: string, private readonly builder: WhereQueryBuilder<T>) {
         this.whereClauses = [];
         this.propertyMappings = propertyMappings;
     }
@@ -76,6 +76,18 @@ export class QueryCondition<T, K extends keyof T> {
         return this;
     }
 
+    and<K extends keyof T & string>(propertySelector: K): QueryCondition<T, K> {
+        const newCondition = this.builder.where(propertySelector);
+        this.builder.finalize().addWhereClause(this.buildCondition());
+        return newCondition;
+    }
+
+    or<K extends keyof T & string>(propertySelector: K): QueryCondition<T, K> {
+        const newCondition = this.builder.where(propertySelector);
+        this.builder.finalize().addOrWhereClause(this.buildOrCondition());
+        return newCondition;
+    }
+
     private formatValue(value: any): string {
         const type = this.propertyMappings.find(
             (mapping) => mapping.entityProperty === this.property
@@ -83,17 +95,20 @@ export class QueryCondition<T, K extends keyof T> {
         return valueQueryFormatter(EntityTransformer.formatValueToSQLiteType(value, type));
     }
 
-    build(): string {
+    private buildCondition(): string {
         return this.whereClauses.join(" AND ");
     }
+
+    private buildOrCondition(): string {
+        return this.whereClauses.join(" OR ");
+    }
+
+    finalize() {
+        return this.builder.finalize().addWhereClause(this.buildCondition());
+    }
+
+    build(): string {
+        this.builder.finalize().addWhereClause(this.buildCondition());
+        return this.builder.finalize().build();
+    }
 }
-
-
-
-/**
- *const whereClause = new WhereQueryBuilder<UserEntity>()
-  .where("id").equals(1)
-  .where("createdAt").greaterThan(new Date("2023-06-14"))
-  .where("name").in(["John", "Jane"])
-  .build();
- */

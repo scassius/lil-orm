@@ -1,16 +1,24 @@
 import { Repository } from "./core";
-import { QueryBuilder } from "./core/query-builder";
-import { SQLiteDatabase } from "./core/sqlite-database";
+import { DatabaseConnection } from "./core/database/database-connection";
+import { CreateTableQueryBuilder } from "./core/query-builders/create-table-query-builder";
+
+/**
+ * TODO:
+ * SQL Injection
+ * Multiple entities select
+ * Joins
+ * Nestes where
+ */
 
 export class LilORM {
-  private readonly sqliteDatabase: SQLiteDatabase;
+  private readonly databaseConnection: DatabaseConnection;
 
   /**
    * Creates an instance of LilORM.
    * @param {string} databaseString - The connection string or file path of the SQLite database.
    */
   constructor(private readonly databaseString: string) {
-    this.sqliteDatabase = new SQLiteDatabase(this.databaseString);
+    this.databaseConnection = new DatabaseConnection(this.databaseString, 'sqlite');
   }
 
   /**
@@ -19,8 +27,8 @@ export class LilORM {
    * @returns {Promise<void>} A Promise that resolves when the table is created.
    */
   async createTable<TEntity>(entityClass: TEntity): Promise<void> {
-    const createTableQuery = QueryBuilder.createTableSql(entityClass);
-    await this.sqliteDatabase.run(createTableQuery);
+    const createTableQuery = CreateTableQueryBuilder.createTableSql(entityClass);
+    await this.databaseConnection.executeNonQuery(createTableQuery);
   }
 
   /**
@@ -31,7 +39,7 @@ export class LilORM {
   getRepository<TEntity>(
     entityClass: new () => TEntity extends object ? TEntity : any
   ): Repository<TEntity> {
-    return new Repository<TEntity>(entityClass, this.sqliteDatabase);
+    return new Repository<TEntity>(entityClass, this.databaseConnection);
   }
 
   /**
@@ -41,11 +49,11 @@ export class LilORM {
    */
   async tableExists(tableName: string): Promise<boolean> {
     const query = `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}'`;
-    const res = await this.sqliteDatabase.query<{ name: string }>(query);
-    return res.count > 0;
+    const res = await this.databaseConnection.executeQuery(query);
+    return res.length > 0;
   }
 
   get dbInstance() {
-    return this.sqliteDatabase;
+    return this.databaseConnection;
   }
 }

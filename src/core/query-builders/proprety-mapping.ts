@@ -26,7 +26,7 @@ export function getPropertyMappings<T>(entityClass: new () => T extends object ?
 
 export function valueQueryFormatter(value: any): string {
     if (value === null) return `NULL`;
-    if (TypesHelper.isString(value)) return `'${value}'`;
+    if (TypesHelper.isString(value)) return `${value}`;
     if (TypesHelper.isDate(value)) return `${(value as Date).getTime()}`;
     if (TypesHelper.isBoolean(value)) return value ? "1" : "0";
     if (TypesHelper.isNumber(value)) return value.toString();

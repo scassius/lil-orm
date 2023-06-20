@@ -1,5 +1,3 @@
-import { RADIX } from "./constants";
-
 export class TypesHelper {
   static isJSONObject(value: any): boolean {
     return typeof value === "object";
@@ -29,7 +27,7 @@ export class TypesHelper {
   }
 
   static parseInteger(value: any): number {
-    return parseInt(value, RADIX);
+    return parseInt(value, 10);
   }
 
   static parseString(value: any): string {

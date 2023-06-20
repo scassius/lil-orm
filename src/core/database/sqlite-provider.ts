@@ -1,6 +1,6 @@
 import * as sqlite3 from "sqlite3";
-import { EntityTransformer } from "./entity-transformer";
-import { EntityType } from "./types";
+import { EntityTransformer } from "../entity-transformer";
+import { EntityType } from "../types";
 
 export interface Result<T> {
   rows: T[];
@@ -10,7 +10,7 @@ export interface Result<T> {
 export class SQLiteDatabase {
   private db: sqlite3.Database;
 
-  constructor(private readonly database: string) {
+  constructor(database: string) {
     this.db = new sqlite3.Database(database);
   }
 
@@ -30,25 +30,13 @@ export class SQLiteDatabase {
     });
   }
 
-  query<T>(query: string, entityClass?: EntityType<T>): Promise<Result<T>> {
+  query(query: string): Promise<any[]> {
     return new Promise((resolve, reject) => {
       this.db.all(query, (error, rows) => {
         if (error) {
           reject(error);
         } else {
-          resolve({
-            rows: entityClass
-              ? rows.map((row) => {
-                  return EntityTransformer.transformSQLEntityToObject(
-                    new entityClass(),
-                    row
-                  );
-                })
-              : rows.map((row) => {
-                  return row as T;
-                }),
-            count: rows.length,
-          });
+          resolve([...rows]);
         }
       });
     });

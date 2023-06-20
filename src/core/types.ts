@@ -14,15 +14,31 @@ export type LilOrmTypeExtension = "JSON" | "BOOLEAN" | "DATE" | "UUID";
 
 export type LilORMType = SQLiteType | LilOrmTypeExtension;
 
-export const MapTypes = {
+export const OrmTypesToSQLiteMap = {
   INTEGER: "INTEGER",
   TEXT: "TEXT",
   REAL: "REAL",
   BLOB: "BLOB",
   JSON: "TEXT",
   BOOLEAN: "INTEGER",
-  DATE: "TEXT",
+  DATE: "INTEGER",
   UUID: "TEXT",
 };
+/*
+export const TSTypesToOrmTypesMap = {
+  "string": 'TEXT'
+  "number": 'REAL',
+  "bigint": 'INTEGER'
+  "boolean": 'BOOLEAN',
+  "object" | "function"
+  any: 'JSON',
+  number: 'REAL',
+  boolean: 'INTEGER',
+  Date: 'TEXT',
+  string: 'TEXT',
+  bigint: 'INTEGER',
+  Buffer: "BLOB",
+  Array: 'JSON'
+}*/
 
 export type EntityType<T> = new () => T extends object ? T : any;

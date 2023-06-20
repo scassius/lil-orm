@@ -1,4 +1,4 @@
-import { SQLiteDatabase } from "./sqlite-database";
+import { SQLiteDatabase } from "../database/sqlite-provider";
 
 export class Transaction {
   private statements: string[];

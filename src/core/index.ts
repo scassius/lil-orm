@@ -1,3 +1,2 @@
-export { Repository } from "./repository";
-export { Transaction } from "./transaction";
+export { Repository } from "./data-access-layer/entity-repository";
 export * from "./decorators";

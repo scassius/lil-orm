@@ -2,7 +2,7 @@ import {
   COLUMN_METADATA_KEY,
   ENTITY_METADATA_KEY,
   PRIMARY_KEY_METADATA_KEY,
-} from "./constants";
+} from "./metadata/constants";
 import { LilORMType } from "./types";
 
 /**

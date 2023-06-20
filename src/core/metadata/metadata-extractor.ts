@@ -3,9 +3,10 @@ import {
   ENTITY_METADATA_KEY,
   PRIMARY_KEY_METADATA_KEY,
 } from "./constants";
-import { EntityTransformer } from "./entity-transformer";
-import { ColumnMetadata, LilORMType, MapTypes, SQLiteType } from "./types";
-import { TypesHelper } from "./types-helper";
+import { ColumnOtps } from "../decorators";
+import { EntityTransformer } from "../entity-transformer";
+import { ColumnMetadata, LilORMType, SQLiteType } from "../types";
+import { TypesHelper } from "../types-helper";
 
 export class MetadataExtractor {
   /**
@@ -125,5 +126,12 @@ export class MetadataExtractor {
     }
 
     return values;
+  }
+
+  static getColumnMetadata(
+    target: any,
+    propertyKey: string | symbol
+  ): ColumnOtps {
+    return Reflect.getMetadata(COLUMN_METADATA_KEY, target, propertyKey);
   }
 }

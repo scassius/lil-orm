@@ -71,6 +71,14 @@ supported types:
 
 To ensure proper functioning of the library, please make sure to configure your TypeScript project correctly.
 
+```json
+"experimentalDecorators": true,
+"emitDecoratorMetadata": true,
+"esModuleInterop": true,
+```
+
+**Other configurations**
+
 **Option 1: Enable `useDefineForClassFields`**
 
 In your project's `tsconfig.json`, add or modify the `compilerOptions` section to include the following:

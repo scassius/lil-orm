@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryKey } from "../core/decorators";
+import { Column, Entity, PrimaryKey } from "../src/core/decorators";
 import "reflect-metadata"
 
 //@ts-ignore

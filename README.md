@@ -1,7 +1,11 @@
 ![ORM](https://github.com/scassius/lil-orm/assets/35706430/5fd46412-ea3d-40b8-a56a-20450e9e2986)
 
 # Lil ORM
-Lil ORM is a super lightweight SQLite ORM for Node.js. With its clear API, you can easily interact with SQLite databases
+Lil ORM is a lightweight SQLite ORM designed for Node.js. This compact project prioritizes clarity and simplicity in its API, making it effortless to interact with SQLite databases. Although it's a lightweight ORM, it boasts a robust set of capabilities, letting developers create intricate database queries with ease.
+
+While Lil ORM is primarily intended as a learning resource and experimental project, its lean design and user-friendly approach make it a noteworthy tool for those looking to understand the nuances of building APIs without the complexity that often accompanies larger ORMs.
+
+Please note: Lil ORM is currently not recommended for use in production environments (yet), but rather as a learning tool and sandbox for testing and development purposes
 
 ⚠️ **API are subjected to change** ⚠️ 
 
@@ -121,61 +125,43 @@ module.createTable(UserEntity) //to create a table from an entity
 
 # CRUD Operations
 ```typescript
-//get repository for DAO
+//get repository
 const repository = module.getRepository<UserEntity>(UserEntity);
 
-//Create
- await repository.create({
-    id: 1,
-    email: 'test@gmail.com',
-    name: 'test',
-    config: {
-    test: true,
-    },
-    isActive: true,
-    createdAt: new Date(),
-});
+//Insert 
+const userEntity = new UserEntity();
+userEntity.id = 1;
+userEntity.name = 'test';
+userEntity.email = 'test@example.com';
+userEntity.isActive = false;
+userEntity.age = 42;
+userEntity.config = null;
+userEntity.createdAt = new Date();
 
-//Find one
-await repository.findOne({ id: 1 });
+await repository.insert(userEntity);
 
-//Find all
-await repository.findAll();
+//Find by id
+const users = await repository.retrieve(qb => qb.where('id').equals(1));
 
 //Update
-const updatedUser = {
-    id: 1,
-    email: 'updated@gmail.com',
-    name: 'updated',
-};
-await repository.update(updatedUser);
+userEntity.name = 'updated';
+await repository.update(userEntity, qb => qb.where('id').equals(1));
 
 //Delete
 await repository.delete({ id: 69 });
 ```
 
-# Transactions
+# Custom query with query builder
 ```typescript
-import { Transaction } from 'lil-orm';
-
-const repository = module.getRepository<UserEntity>(UserEntity);
-
-const transaction = new Transaction(repository.dbInstance);
-
-transaction.transaction(async (transaction) => {
-    repository.create(
-    {
-        id: 1,
-        email: 'test@gmail.com',
-        name: 'test',
-        config: {
-        test: true,
-        },
-        isActive: true,
-        createdAt: new Date(),
-    },
-    transaction,
-    );
-});
+let user: any[] = lilOrm.retrieve<UserEntity>(
+            qb => qb.forEntity(UserEntity)
+            .where('isActive').equals(true)
+            .and('age').greaterThan(18)
+            .or('config').equals({ allowed: true })
+            .finalize(), 
+            (data) => data)
 ```
 
+# Transactions
+
+TO-DO

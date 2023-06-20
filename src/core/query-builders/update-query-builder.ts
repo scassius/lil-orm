@@ -29,7 +29,7 @@ export class UpdateQueryBuilder<T> {
             }
         }
     
-        this.queryBuilder.setSetClauses(setClause);
+        this.queryBuilder.internal.setSetClauses(setClause);
 
         return this;
     }

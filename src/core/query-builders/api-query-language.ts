@@ -34,6 +34,40 @@ export class QueryBuilderAPI {
         this.columns = [];
         this.values = [];
         this.logicOperators = [];
+
+        const self = this;
+        this.internal = {
+            setColumns(columns: string[]): QueryBuilderAPI {
+                self.columns = columns;
+                return self;
+            },
+            setValues(values: string[]): QueryBuilderAPI {
+                self.values = values;
+                return self;
+            },
+            setSetClauses(setClauses: string[]): QueryBuilderAPI {
+                self.setClauses = setClauses;
+                return self;
+            },
+            setOperationType(operationType: OperationType): QueryBuilderAPI {
+                self.operationType = operationType;
+                return self;
+            },
+            addOrWhereClause(orWhereClause: string): QueryBuilderAPI {
+                if (orWhereClause != '') {
+                    self.whereClauses.push(orWhereClause);
+                    self.logicOperators.push("OR");
+                }
+                return self;
+            },
+            addWhereClause(whereClause: string): QueryBuilderAPI {
+                if (whereClause != '') {
+                    self.whereClauses.push(whereClause);
+                    self.logicOperators.push("AND");
+                }
+                return self;
+            },
+        }
     }
 
     forEntity<T>(entityClass: new () => T extends object ? T : any, operationType: OperationType = OperationType.Select): WhereQueryBuilder<T> {
@@ -59,41 +93,14 @@ export class QueryBuilderAPI {
         return new DeleteQueryBuilder(entityClass, this);
     }
 
-    addWhereClause(whereClause: string): QueryBuilderAPI {
-        if (whereClause != '') {
-            this.whereClauses.push(whereClause);
-            this.logicOperators.push("AND");
-        }
-        return this;
-    }
-
-    addOrWhereClause(orWhereClause: string): QueryBuilderAPI {
-        if (orWhereClause != '') {
-            this.whereClauses.push(orWhereClause);
-            this.logicOperators.push("OR");
-        }
-        return this;
-    }
-
-    setOperationType(operationType: OperationType): QueryBuilderAPI {
-        this.operationType = operationType;
-        return this;
-    }
-
-    setSetClauses(setClauses: string[]): QueryBuilderAPI {
-        this.setClauses = setClauses;
-        return this;
-    }
-
-    setColumns(columns: string[]): QueryBuilderAPI {
-        this.columns = columns;
-        return this;
-    }
-
-    setValues(values: string[]): QueryBuilderAPI {
-        this.values = values;
-        return this;
-    }
+    public internal: {
+        setColumns: (columns: string[]) => QueryBuilderAPI;
+        setValues: (values: string[]) => QueryBuilderAPI;
+        setSetClauses: (setClauses: string[]) => QueryBuilderAPI;
+        setOperationType: (operationType: OperationType) => QueryBuilderAPI;
+        addOrWhereClause: (orWhereClause: string) => QueryBuilderAPI;
+        addWhereClause: (whereClause: string) => QueryBuilderAPI;
+    };
 
     build(): string {
         let fromClause = '';

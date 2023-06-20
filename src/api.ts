@@ -1,5 +1,8 @@
 import { Repository } from "./core";
+import { DataAccessLayer } from "./core/data-access-layer/data-access-layer";
 import { DatabaseConnection } from "./core/database/database-connection";
+import { EntityTransformer } from "./core/entity-transformer";
+import { QueryBuilderAPI } from "./core/query-builders/api-query-language";
 import { CreateTableQueryBuilder } from "./core/query-builders/create-table-query-builder";
 
 /**
@@ -12,6 +15,7 @@ import { CreateTableQueryBuilder } from "./core/query-builders/create-table-quer
 
 export class LilORM {
   private readonly databaseConnection: DatabaseConnection;
+  private readonly dataAccessLayer: DataAccessLayer;
 
   /**
    * Creates an instance of LilORM.
@@ -19,6 +23,20 @@ export class LilORM {
    */
   constructor(private readonly databaseString: string) {
     this.databaseConnection = new DatabaseConnection(this.databaseString, 'sqlite');
+    this.dataAccessLayer = new DataAccessLayer(this.databaseConnection);
+  }
+
+  async retrieve<TEntity>(conditionBuilder: (queryBuilder: QueryBuilderAPI) => QueryBuilderAPI, entityMapper: (data: any) => TEntity): Promise<TEntity[]> {
+    const initialQueryBuilder = new QueryBuilderAPI();
+    
+    const finalizedQueryBuilder = conditionBuilder(initialQueryBuilder);
+
+    const results = await this.dataAccessLayer.retrieve(
+      finalizedQueryBuilder,
+      (data) => entityMapper(data)
+    );
+
+    return results;
   }
 
   /**
@@ -55,5 +73,9 @@ export class LilORM {
 
   get dbInstance() {
     return this.databaseConnection;
+  }
+
+  get dal() {
+    return this.dataAccessLayer;
   }
 }

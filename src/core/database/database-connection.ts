@@ -17,7 +17,7 @@ export class DatabaseConnection {
 
     public async executeQuery(query: string): Promise<any[]> {
         const result = await this.connection.query(query);
-        return result.rows;
+        return result;
     }
 
     public async executeNonQuery(query: string): Promise<void> {

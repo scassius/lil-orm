@@ -78,13 +78,13 @@ export class QueryCondition<T, K extends keyof T> {
 
     and<K extends keyof T & string>(propertySelector: K): QueryCondition<T, K> {
         const newCondition = this.builder.where(propertySelector);
-        this.builder.finalize().addWhereClause(this.buildCondition());
+        this.builder.finalize().internal.addWhereClause(this.buildCondition());
         return newCondition;
     }
 
     or<K extends keyof T & string>(propertySelector: K): QueryCondition<T, K> {
         const newCondition = this.builder.where(propertySelector);
-        this.builder.finalize().addOrWhereClause(this.buildOrCondition());
+        this.builder.finalize().internal.addOrWhereClause(this.buildOrCondition());
         return newCondition;
     }
 
@@ -104,11 +104,11 @@ export class QueryCondition<T, K extends keyof T> {
     }
 
     finalize() {
-        return this.builder.finalize().addWhereClause(this.buildCondition());
+        return this.builder.finalize().internal.addWhereClause(this.buildCondition());
     }
 
     build(): string {
-        this.builder.finalize().addWhereClause(this.buildCondition());
+        this.builder.finalize().internal.addWhereClause(this.buildCondition());
         return this.builder.finalize().build();
     }
 }

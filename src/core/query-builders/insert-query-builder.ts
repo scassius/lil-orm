@@ -26,8 +26,8 @@ export class InsertQueryBuilder<T> {
             }
         }
     
-        this.queryBuilder.setValues(filteredValues);
-        this.queryBuilder.setColumns(filteredColumns);
+        this.queryBuilder.internal.setValues(filteredValues);
+        this.queryBuilder.internal.setColumns(filteredColumns);
     
         return this;
     }

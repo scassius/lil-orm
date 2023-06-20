@@ -1,3 +1,1 @@
-export abstract class IDatabaseProvider {
-    
-}
+export abstract class IDatabaseProvider {}

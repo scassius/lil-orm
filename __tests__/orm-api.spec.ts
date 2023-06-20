@@ -13,7 +13,7 @@ describe('LilORM API', () => {
     });
 
     it('should build a query and retive an object', async () => {
-        let user = lilOrm.retrieve<UserEntity>(
+        const user = lilOrm.retrieve<UserEntity>(
             qb => qb.forEntity(UserEntity)
             .where('isActive').equals(true)
             .and('age').greaterThan(18)

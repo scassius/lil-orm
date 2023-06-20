@@ -22,13 +22,19 @@ export class LilORM {
    * @param {string} databaseString - The connection string or file path of the SQLite database.
    */
   constructor(private readonly databaseString: string) {
-    this.databaseConnection = new DatabaseConnection(this.databaseString, 'sqlite');
+    this.databaseConnection = new DatabaseConnection(
+      this.databaseString,
+      "sqlite"
+    );
     this.dataAccessLayer = new DataAccessLayer(this.databaseConnection);
   }
 
-  async retrieve<TEntity>(conditionBuilder: (queryBuilder: QueryBuilderAPI) => QueryBuilderAPI, entityMapper: (data: any) => TEntity): Promise<TEntity[]> {
+  async retrieve<TEntity>(
+    conditionBuilder: (queryBuilder: QueryBuilderAPI) => QueryBuilderAPI,
+    entityMapper: (data: any) => TEntity
+  ): Promise<TEntity[]> {
     const initialQueryBuilder = new QueryBuilderAPI();
-    
+
     const finalizedQueryBuilder = conditionBuilder(initialQueryBuilder);
 
     const results = await this.dataAccessLayer.retrieve(
@@ -45,7 +51,8 @@ export class LilORM {
    * @returns {Promise<void>} A Promise that resolves when the table is created.
    */
   async createTable<TEntity>(entityClass: TEntity): Promise<void> {
-    const createTableQuery = CreateTableQueryBuilder.createTableSql(entityClass);
+    const createTableQuery =
+      CreateTableQueryBuilder.createTableSql(entityClass);
     await this.databaseConnection.executeNonQuery(createTableQuery);
   }
 

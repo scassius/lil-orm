@@ -1,6 +1,11 @@
 import { COLUMN_METADATA_KEY } from "./metadata/constants";
 import { MetadataExtractor } from "./metadata/metadata-extractor";
-import { ColumnMetadata, LilORMType, OrmTypesToSQLiteMap, SQLiteType } from "./types";
+import {
+  ColumnMetadata,
+  LilORMType,
+  OrmTypesToSQLiteMap,
+  SQLiteType,
+} from "./types";
 import { TypesHelper } from "./types-helper";
 
 export class EntityTransformer {
@@ -59,33 +64,37 @@ export class EntityTransformer {
 
   static get typeFormatters() {
     return {
-      TEXT: (value: any) => (typeof value === 'string' ? `'${value}'` : String(value)),
-      INTEGER: (value: any) => (typeof value === 'boolean' ? value ? 1 : 0 : parseInt(value, 10)),
+      TEXT: (value: any) =>
+        typeof value === "string" ? `'${value}'` : String(value),
+      INTEGER: (value: any) =>
+        typeof value === "boolean" ? (value ? 1 : 0) : parseInt(value, 10),
       REAL: (value: any) => parseFloat(value),
       JSON: (value: any) => `'${JSON.stringify(value)}'`,
-      BOOLEAN: (value: any) => value == true ? 1 : 0,
-      DATE: (value: any) => `${(new Date(value)).getTime()}`,
+      BOOLEAN: (value: any) => (value === true ? 1 : 0),
+      DATE: (value: any) => `${new Date(value).getTime()}`,
       BLOB: (value: any) => `'${value}'`,
-      UUID: (value: any) => `'${value}'`
+      UUID: (value: any) => `'${value}'`,
     };
   }
 
   static get invTypeFormatters() {
     return {
-      TEXT: (value: any) => (typeof value === 'string' ? `${value}` : String(value)),
-      INTEGER: (value: any) => (typeof value === 'boolean' ? value ? 1 : 0 : parseInt(value, 10)),
+      TEXT: (value: any) =>
+        typeof value === "string" ? `${value}` : String(value),
+      INTEGER: (value: any) =>
+        typeof value === "boolean" ? (value ? 1 : 0) : parseInt(value, 10),
       REAL: (value: any) => parseFloat(value),
       JSON: (value: any) => JSON.parse(value),
       BOOLEAN: (value: any) => Boolean(value),
       DATE: (value: any) => new Date(parseInt(value, 10)),
       BLOB: (value: any) => value,
-      UUID: (value: any) => value
+      UUID: (value: any) => value,
     };
   }
 
   static formatValue(value: any, type: LilORMType): any {
-    if(value === undefined || Number.isNaN(value)) return undefined;
-    if(value === null) return null;
+    if (value === undefined || Number.isNaN(value)) return undefined;
+    if (value === null) return null;
     const formatter = EntityTransformer.invTypeFormatters[type];
     if (formatter) {
       return formatter(value);
@@ -94,9 +103,8 @@ export class EntityTransformer {
   }
 
   static formatValueToSQLiteType(value: any, type: LilORMType): any {
-    if(value === undefined) return undefined;
-    if(value === null) return 'NULL';
-    //const mappedType = OrmTypesToSQLiteMap[type] as SQLiteType;
+    if (value === undefined) return undefined;
+    if (value === null) return "NULL";
 
     const formatter = EntityTransformer.typeFormatters[type];
     if (formatter) {

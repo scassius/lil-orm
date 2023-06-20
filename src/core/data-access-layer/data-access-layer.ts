@@ -8,7 +8,10 @@ export class DataAccessLayer {
     this.database = database;
   }
 
-  public async retrieve<T>(queryBuilder: QueryBuilderAPI, entityMapper: (data: any) => T): Promise<T[]> {
+  public async retrieve<T>(
+    queryBuilder: QueryBuilderAPI,
+    entityMapper: (data: any) => T
+  ): Promise<T[]> {
     const query = queryBuilder.build();
     const queryResult = await this.database.executeQuery(query);
     return queryResult.map(entityMapper);

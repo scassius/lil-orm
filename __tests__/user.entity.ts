@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryKey } from "../src/core/decorators";
 import "reflect-metadata"
-
+/* tslint:disable:comment-format */
 //@ts-ignore
 @Entity("users")
 export class UserEntity {
@@ -58,3 +58,4 @@ export class UserEntity {
   })
   age: number;
 }
+/* tslint:disable:comment-format */

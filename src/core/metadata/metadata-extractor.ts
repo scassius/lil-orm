@@ -133,5 +133,5 @@ export class MetadataExtractor {
     propertyKey: string | symbol
   ): ColumnOtps {
     return Reflect.getMetadata(COLUMN_METADATA_KEY, target, propertyKey);
-  };
+  }
 }

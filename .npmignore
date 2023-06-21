@@ -19,6 +19,10 @@
 .eslintignore
 .babelrc
 .editorconfig
+tsconfig.json
+tslint.json
+jestconfig.json
+jest.config.js
 
 # Source control files
 .gitignore
@@ -29,3 +33,4 @@
 *.tmp
 *.bak
 *.swp
+*.spec.ts

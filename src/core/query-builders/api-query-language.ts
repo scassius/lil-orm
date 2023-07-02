@@ -75,7 +75,7 @@ export class QueryBuilderAPI {
           self.logicOperators.push("AND");
         }
         return self;
-      }
+      },
     };
   }
 

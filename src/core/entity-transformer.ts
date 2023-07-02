@@ -9,10 +9,7 @@ import {
 import { TypesHelper } from "./types-helper";
 
 export class EntityTransformer {
-  static sqlEntityToObj<TEntity>(
-    entityInstance: any,
-    values: any
-  ): TEntity {
+  static sqlEntityToObj<TEntity>(entityInstance: any, values: any): TEntity {
     const properties = Object.keys(entityInstance);
     const entity: any = {};
 

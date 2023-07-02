@@ -5,9 +5,7 @@ import { Transaction } from "./transaction";
 import { DataAccessLayer } from "./data-access-layer";
 import { QueryBuilderAPI } from "../query-builders/api-query-language";
 import { DatabaseConnection } from "../database/database-connection";
-import {
-  WhereQueryBuilder,
-} from "../query-builders/where-query-builder";
+import { WhereQueryBuilder } from "../query-builders/where-query-builder";
 import { UpdateQueryBuilder } from "../query-builders/update-query-builder";
 import { DeleteQueryBuilder } from "../query-builders/delete-query-builder";
 import { QueryCondition } from "../query-builders/query-condition";
@@ -54,10 +52,7 @@ export class Repository<TEntity> {
     const results = await this.dataAccessLayer.retrieve(
       finalizedQueryBuilder.finalize(),
       (data) =>
-        EntityTransformer.sqlEntityToObj<TEntity>(
-          new this.entityModel(),
-          data
-        )
+        EntityTransformer.sqlEntityToObj<TEntity>(new this.entityModel(), data)
     );
 
     return results;

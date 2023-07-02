@@ -16,7 +16,6 @@ import { SchemaGenerator } from "./core/schema-generator/schema-generator";
  */
 
 export class LilORM {
-
   private readonly databaseConnection: DatabaseConnection;
   private readonly dataAccessLayer: DataAccessLayer;
   private readonly _schemaGenerator: SchemaGenerator;
@@ -58,7 +57,7 @@ export class LilORM {
    * @returns {Promise<void>} A Promise that resolves when the table is created.
    */
   async createTable<TEntity>(entityClass: TEntity): Promise<void> {
-    await this.schemaGenerator.createTable(entityClass)
+    await this.schemaGenerator.createTable(entityClass);
   }
 
   /**

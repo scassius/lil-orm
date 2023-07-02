@@ -3,7 +3,8 @@ import { DataAccessLayer } from "./core/data-access-layer/data-access-layer";
 import { DatabaseConnection } from "./core/database/database-connection";
 import { EntityTransformer } from "./core/entity-transformer";
 import { QueryBuilderAPI } from "./core/query-builders/api-query-language";
-import { CreateTableQueryBuilder } from "./core/query-builders/create-table-query-builder";
+import { CreateTableQueryBuilder } from "./core/schema-generator/create-table-query-builder";
+import { SchemaGenerator } from "./core/schema-generator/schema-generator";
 
 /**
  * TODO:
@@ -16,6 +17,7 @@ import { CreateTableQueryBuilder } from "./core/query-builders/create-table-quer
 export class LilORM {
   private readonly databaseConnection: DatabaseConnection;
   private readonly dataAccessLayer: DataAccessLayer;
+  private readonly _schemaGenerator: SchemaGenerator;
 
   /**
    * Creates an instance of LilORM.
@@ -27,6 +29,7 @@ export class LilORM {
       "sqlite"
     );
     this.dataAccessLayer = new DataAccessLayer(this.databaseConnection);
+    this._schemaGenerator = new SchemaGenerator(this.databaseConnection);
   }
 
   async retrieve<TEntity>(
@@ -51,9 +54,7 @@ export class LilORM {
    * @returns {Promise<void>} A Promise that resolves when the table is created.
    */
   async createTable<TEntity>(entityClass: TEntity): Promise<void> {
-    const createTableQuery =
-      CreateTableQueryBuilder.createTableSql(entityClass);
-    await this.databaseConnection.executeNonQuery(createTableQuery);
+    await this.schemaGenerator.createTable(entityClass)
   }
 
   /**
@@ -84,5 +85,9 @@ export class LilORM {
 
   get dal() {
     return this.dataAccessLayer;
+  }
+
+  get schemaGenerator() {
+    return this._schemaGenerator;
   }
 }

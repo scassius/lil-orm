@@ -5,7 +5,7 @@ import { OrmTypesToSQLiteMap, SQLiteType } from "../types";
 import "reflect-metadata";
 
 export class CreateTableQueryBuilder {
-  static createTableSql(entityClass: any): string {
+  createTableSql(entityClass: any): string {
     const entityMetadata = MetadataExtractor.getEntityTableName(entityClass);
     if (!entityMetadata) {
       throw new Error("Entity metadata not found");

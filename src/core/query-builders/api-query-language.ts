@@ -23,6 +23,15 @@ export class QueryBuilderAPI {
   private setClauses: string[];
   private logicOperators: string[];
 
+  public internal: {
+    setColumns: (columns: string[]) => QueryBuilderAPI;
+    setValues: (values: string[]) => QueryBuilderAPI;
+    setSetClauses: (setClauses: string[]) => QueryBuilderAPI;
+    setOperationType: (operationType: OperationType) => QueryBuilderAPI;
+    addOrWhereClause: (orWhereClause: string) => QueryBuilderAPI;
+    addWhereClause: (whereClause: string) => QueryBuilderAPI;
+  };
+
   constructor() {
     this.whereClauses = [];
     this.entityQueries = [];
@@ -66,7 +75,7 @@ export class QueryBuilderAPI {
           self.logicOperators.push("AND");
         }
         return self;
-      },
+      }
     };
   }
 
@@ -101,15 +110,6 @@ export class QueryBuilderAPI {
     this.operationType = OperationType.DeleteFrom;
     return new DeleteQueryBuilder(entityClass, this);
   }
-
-  public internal: {
-    setColumns: (columns: string[]) => QueryBuilderAPI;
-    setValues: (values: string[]) => QueryBuilderAPI;
-    setSetClauses: (setClauses: string[]) => QueryBuilderAPI;
-    setOperationType: (operationType: OperationType) => QueryBuilderAPI;
-    addOrWhereClause: (orWhereClause: string) => QueryBuilderAPI;
-    addWhereClause: (whereClause: string) => QueryBuilderAPI;
-  };
 
   build(): string {
     let fromClause = "";

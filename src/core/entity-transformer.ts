@@ -9,7 +9,7 @@ import {
 import { TypesHelper } from "./types-helper";
 
 export class EntityTransformer {
-  static transformSQLEntityToObject<TEntity>(
+  static sqlEntityToObj<TEntity>(
     entityInstance: any,
     values: any
   ): TEntity {
@@ -32,24 +32,6 @@ export class EntityTransformer {
     }
 
     return entity as TEntity;
-  }
-
-  static transformClassInstanceToEntityColumns(
-    entityInstance: any
-  ): ColumnMetadata[] {
-    const columns =
-      MetadataExtractor.getEnrichedEntityColumnsMetadata(entityInstance);
-    columns
-      .filter((col) => col.value !== undefined)
-      .map((column) => {
-        column.value = this.formatValueToSQLiteType(
-          column.value,
-          column.type
-        ) as SQLiteType;
-        column.type = OrmTypesToSQLiteMap[column.type] as SQLiteType;
-        return column;
-      });
-    return columns;
   }
 
   static valueQueryFormatter(value: any): string {

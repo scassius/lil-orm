@@ -1,4 +1,5 @@
 import { DatabaseConnection } from "../database/database-connection";
+import { EntityTransformer } from "../entity-transformer";
 import { QueryBuilderAPI } from "../query-builders/api-query-language";
 
 export class DataAccessLayer {
@@ -13,7 +14,7 @@ export class DataAccessLayer {
     entityMapper: (data: any) => T
   ): Promise<T[]> {
     const query = queryBuilder.build();
-    const queryResult = await this.database.executeQuery(query);
+    const queryResult = (await this.database.executeQuery(query));
     return queryResult.map(entityMapper);
   }
 

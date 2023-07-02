@@ -54,7 +54,7 @@ export class Repository<TEntity> {
     const results = await this.dataAccessLayer.retrieve(
       finalizedQueryBuilder.finalize(),
       (data) =>
-        EntityTransformer.transformSQLEntityToObject<TEntity>(
+        EntityTransformer.sqlEntityToObj<TEntity>(
           new this.entityModel(),
           data
         )
@@ -63,23 +63,23 @@ export class Repository<TEntity> {
     return results;
   }
 
-  public async insert(entity: TEntity): Promise<void> {
+  public async insert(entityObj: Partial<TEntity>): Promise<void> {
     const queryBuilder = this.queryBuilder
       .insertInto<TEntity>(this.entityModel)
-      .setObject(entity)
+      .setObject(entityObj)
       .finalize();
     await this.dataAccessLayer.insert(queryBuilder);
   }
 
   public async update(
-    entity: TEntity,
+    entityObj: Partial<TEntity>,
     conditionBuilder: (
       whereBuilder: UpdateQueryBuilder<TEntity>
     ) => QueryCondition<TEntity, keyof TEntity>
   ): Promise<void> {
     const whereBuilder = this.queryBuilder
       .update(this.entityModel)
-      .setObject(entity);
+      .setObject(entityObj);
     const queryBuilder = conditionBuilder(whereBuilder).finalize();
     await this.dataAccessLayer.update(queryBuilder);
   }

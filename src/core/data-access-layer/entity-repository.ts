@@ -3,7 +3,10 @@ import { MetadataExtractor } from "../metadata/metadata-extractor";
 import { SQLiteDatabase } from "../database/sqlite-provider";
 import { Transaction } from "./transaction";
 import { DataAccessLayer } from "./data-access-layer";
-import { OperationType, QueryBuilderAPI } from "../query-builders/api-query-language";
+import {
+  OperationType,
+  QueryBuilderAPI,
+} from "../query-builders/api-query-language";
 import { DatabaseConnection } from "../database/database-connection";
 import { WhereQueryBuilder } from "../query-builders/where-query-builder";
 import { UpdateQueryBuilder } from "../query-builders/update-query-builder";
@@ -15,7 +18,7 @@ export class Repository<TEntity> {
   private dataAccessLayer: DataAccessLayer;
   private queryBuilder: QueryBuilderAPI;
 
-  public debugSQLQuery: string = '';
+  public debugSQLQuery: string = "";
   public debugMode: boolean = false;
 
   constructor(
@@ -38,7 +41,7 @@ export class Repository<TEntity> {
   }
 
   private logDebugQuery(queryBuilder: any) {
-    if(this.debugMode) {
+    if (this.debugMode) {
       const queryCopy = structuredClone(queryBuilder);
       this.debugSQLQuery = queryCopy.build();
     }
@@ -58,7 +61,7 @@ export class Repository<TEntity> {
     );
 
     const finalizedQueryBuilder = conditionBuilder(whereQueryBuilder);
-    
+
     this.logDebugQuery(finalizedQueryBuilder);
 
     const results = await this.dataAccessLayer.retrieve(
@@ -75,7 +78,7 @@ export class Repository<TEntity> {
       .insertInto<TEntity>(this.entityModel)
       .setObject(entityObj)
       .finalize();
-    
+
     this.logDebugQuery(queryBuilder);
 
     await this.dataAccessLayer.insert(queryBuilder);
@@ -102,11 +105,14 @@ export class Repository<TEntity> {
       whereBuilder: WhereQueryBuilder<TEntity>
     ) => QueryCondition<TEntity, keyof TEntity>
   ): Promise<void> {
-    const whereBuilder = this.queryBuilder.forEntity(this.entityModel, OperationType.DeleteFrom);
+    const whereBuilder = this.queryBuilder.forEntity(
+      this.entityModel,
+      OperationType.DeleteFrom
+    );
     const queryBuilder = conditionBuilder(whereBuilder).finalize();
 
     this.logDebugQuery(queryBuilder);
-    
+
     await this.dataAccessLayer.delete(queryBuilder);
   }
 }

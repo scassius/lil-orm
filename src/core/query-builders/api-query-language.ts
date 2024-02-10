@@ -12,7 +12,6 @@ export enum OperationType {
 }
 
 export class QueryBuilderAPI {
-
   private operationType: OperationType | null;
   private selectColumns: string[];
   private whereClauses: string[];
@@ -123,7 +122,7 @@ export class QueryBuilderAPI {
   }
 
   public select<T>(columns: (keyof T)[]): QueryBuilderAPI {
-    this.selectColumns = columns.map(column => column.toString());
+    this.selectColumns = columns.map((column) => column.toString());
     return this;
   }
 
@@ -141,9 +140,15 @@ export class QueryBuilderAPI {
     switch (this.operationType) {
       case OperationType.Select:
         fromClause = this.entityQueries.join(", ");
-        const columnsToSelect = this.selectColumns.length > 0 ? this.selectColumns.join(", ") : "*";
-        const sortClause = this.sortColumn ? `ORDER BY ${this.sortColumn} ${this.sortDirection}` : "";
-        const groupByClause = this.groupByColumns.length > 0 ? `GROUP BY ${this.groupByColumns.join(", ")}` : "";
+        const columnsToSelect =
+          this.selectColumns.length > 0 ? this.selectColumns.join(", ") : "*";
+        const sortClause = this.sortColumn
+          ? `ORDER BY ${this.sortColumn} ${this.sortDirection}`
+          : "";
+        const groupByClause =
+          this.groupByColumns.length > 0
+            ? `GROUP BY ${this.groupByColumns.join(", ")}`
+            : "";
         buildStr = `SELECT ${columnsToSelect} FROM ${fromClause} ${whereClauseStr} ${sortClause} ${groupByClause}`;
         break;
 

@@ -1,27 +1,39 @@
-import { SQLiteDatabase } from "./sqlite-provider";
+import { Pool } from "pg";
 
-export type DatabaseDriver = "sqlite";
+export type DatabaseDriver = "postgresql";
 
 export class DatabaseConnection {
-  private readonly connection: SQLiteDatabase;
+  private readonly connection: Pool;
 
   constructor(
     connectionString: string,
     private readonly driver: DatabaseDriver
   ) {
-    this.connection = new SQLiteDatabase(connectionString);
+    this.connection = new Pool({
+      connectionString,
+    });
   }
 
-  get sqliteDbInstance() {
+  get postgresDbInstance() {
     return this.connection;
   }
 
   public async executeQuery(query: string): Promise<any[]> {
-    const result = await this.connection.query(query);
-    return result;
+    const client = await this.connection.connect();
+    try {
+      const res = await client.query(query);
+      return res.rows;
+    } finally {
+      client.release();
+    }
   }
 
   public async executeNonQuery(query: string): Promise<void> {
-    await this.connection.run(query);
+    const client = await this.connection.connect();
+    try {
+      await client.query(query);
+    } finally {
+      client.release();
+    }
   }
 }

@@ -26,7 +26,7 @@ export class UpdateQueryBuilder<T> {
 
     for (let i = 0; i < values.length; i++) {
       if (values[i] !== undefined && !Number.isNaN(values[i])) {
-        setClause.push(`${columns[i]} = ${valueQueryFormatter(values[i])}`);
+        setClause.push(`${columns[i]} = ${values[i]}`);
       }
     }
 

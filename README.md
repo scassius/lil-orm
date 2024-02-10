@@ -1,7 +1,7 @@
 ![ORM](https://github.com/scassius/lil-orm/assets/35706430/5fd46412-ea3d-40b8-a56a-20450e9e2986)
 
 # Lil ORM
-Lil ORM is a lightweight SQLite ORM designed for Node.js. This compact project prioritizes clarity and simplicity in its API, making it effortless to interact with SQLite databases. Although it's a lightweight ORM, it boasts a robust set of capabilities, letting developers create intricate database queries with ease.
+Lil ORM is a lightweight PostgreSQL ORM designed for Node.js. This compact project prioritizes clarity and simplicity in its API, making it effortless to interact with PostgreSQL databases. Although it's a lightweight ORM, it boasts a robust set of capabilities, letting developers create intricate database queries with ease.
 
 While Lil ORM is primarily intended as a learning resource and experimental project, its lean design and user-friendly approach make it a noteworthy tool for those looking to understand the nuances of building APIs without the complexity that often accompanies larger ORMs.
 
@@ -9,9 +9,33 @@ Please note: Lil ORM is currently not recommended for use in production environm
 
 ⚠️ **API are subjected to change** ⚠️ 
 
+# Changelog
+
+## Version 2.0.0
+
+### Added
+- Default database changed to PostgreSQL.
+- Support for specifying `SELECT` clauses.
+- Ability to extract queries from repository for debugging.
+
+### Removed
+- SQLite support as default database.
+
+### Planned Features
+- **Integrated Complex Query Language**: Implement an integrated language for constructing complex queries, enhancing the ORM's ability to handle sophisticated data retrieval and manipulation scenarios.
+- **Dynamic Object Mapping**: Enable dynamic mapping of database results to objects, supporting more flexible and dynamic data models.
+- **Automatic Support for Multiple DBMS Types**: Expand the ORM to automatically support multiple Database Management Systems (DBMS), allowing seamless switching and interoperability across different database platforms.
+- **Loading of Related Objects**: Introduce efficient loading mechanisms for related objects, enabling easier and more efficient handling of object relationships and dependencies in the data model.
+- **Stable Support for Migrations**: Introduce stable support for database schema migrations, including the generation of migration scripts in TypeScript, to facilitate version-controlled schema changes and database evolution.
+
 # Install 
+
 ```shell
 npm i lil-orm
+```
+
+```shell
+yarn add lil-orm
 ```
 
 # Define Entity

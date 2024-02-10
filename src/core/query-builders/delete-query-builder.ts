@@ -14,6 +14,10 @@ export class DeleteQueryBuilder<T> {
     this.queryBuilder.forEntity(this.entityClass, OperationType.DeleteFrom);
   }
 
+  self(): DeleteQueryBuilder<T> {
+    return this;
+  }
+
   where<K extends keyof T & string>(
     propertySelector: K
   ): QueryCondition<T, keyof T & string> {

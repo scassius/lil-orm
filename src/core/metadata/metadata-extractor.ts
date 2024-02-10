@@ -117,7 +117,7 @@ export class MetadataExtractor {
       );
       if (columnMetadata) {
         const propertyValue = entityInstance[propertyKey];
-        const columnValue = EntityTransformer.formatValueToSQLiteType(
+        const columnValue = EntityTransformer.formatValueToPostgreSQLType(
           propertyValue,
           columnMetadata.type
         );

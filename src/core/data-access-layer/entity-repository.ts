@@ -3,7 +3,7 @@ import { MetadataExtractor } from "../metadata/metadata-extractor";
 import { SQLiteDatabase } from "../database/sqlite-provider";
 import { Transaction } from "./transaction";
 import { DataAccessLayer } from "./data-access-layer";
-import { QueryBuilderAPI } from "../query-builders/api-query-language";
+import { OperationType, QueryBuilderAPI } from "../query-builders/api-query-language";
 import { DatabaseConnection } from "../database/database-connection";
 import { WhereQueryBuilder } from "../query-builders/where-query-builder";
 import { UpdateQueryBuilder } from "../query-builders/update-query-builder";
@@ -14,6 +14,9 @@ export class Repository<TEntity> {
   private readonly _tableName: string;
   private dataAccessLayer: DataAccessLayer;
   private queryBuilder: QueryBuilderAPI;
+
+  public debugSQLQuery: string = '';
+  public debugMode: boolean = false;
 
   constructor(
     private readonly entityModel: new () => TEntity extends object
@@ -34,6 +37,13 @@ export class Repository<TEntity> {
     return this.tableName;
   }
 
+  private logDebugQuery(queryBuilder: any) {
+    if(this.debugMode) {
+      const queryCopy = structuredClone(queryBuilder);
+      this.debugSQLQuery = queryCopy.build();
+    }
+  }
+
   async retrieve(
     conditionBuilder: (
       queryBuilder: WhereQueryBuilder<TEntity>
@@ -48,6 +58,8 @@ export class Repository<TEntity> {
     );
 
     const finalizedQueryBuilder = conditionBuilder(whereQueryBuilder);
+    
+    this.logDebugQuery(finalizedQueryBuilder);
 
     const results = await this.dataAccessLayer.retrieve(
       finalizedQueryBuilder.finalize(),
@@ -63,6 +75,9 @@ export class Repository<TEntity> {
       .insertInto<TEntity>(this.entityModel)
       .setObject(entityObj)
       .finalize();
+    
+    this.logDebugQuery(queryBuilder);
+
     await this.dataAccessLayer.insert(queryBuilder);
   }
 
@@ -76,16 +91,22 @@ export class Repository<TEntity> {
       .update(this.entityModel)
       .setObject(entityObj);
     const queryBuilder = conditionBuilder(whereBuilder).finalize();
+
+    this.logDebugQuery(queryBuilder);
+
     await this.dataAccessLayer.update(queryBuilder);
   }
 
   public async delete(
     conditionBuilder: (
-      whereBuilder: DeleteQueryBuilder<TEntity>
+      whereBuilder: WhereQueryBuilder<TEntity>
     ) => QueryCondition<TEntity, keyof TEntity>
   ): Promise<void> {
-    const whereBuilder = this.queryBuilder.deleteFrom(this.entityModel);
+    const whereBuilder = this.queryBuilder.forEntity(this.entityModel, OperationType.DeleteFrom);
     const queryBuilder = conditionBuilder(whereBuilder).finalize();
+
+    this.logDebugQuery(queryBuilder);
+    
     await this.dataAccessLayer.delete(queryBuilder);
   }
 }

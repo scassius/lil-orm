@@ -1,7 +1,6 @@
 import { EntityTransformer } from "./entity-transformer";
 
 export class MapperAPI {
-  
   /**
    * This function converts raw SQL entity data into an instance of a given entity class.
    * It uses metadata (from decorators) associated with the entity class to correctly serialize the values (e.g., string to JSON).

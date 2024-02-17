@@ -1,13 +1,12 @@
 import { Pool } from "pg";
-
-export type DatabaseDriver = "postgresql";
+import { DBSMType } from "../types";
 
 export class DatabaseConnection {
   private readonly connection: Pool;
 
   constructor(
     connectionString: string,
-    private readonly driver: DatabaseDriver
+    private readonly driver: DBSMType
   ) {
     this.connection = new Pool({
       connectionString,
@@ -18,7 +17,7 @@ export class DatabaseConnection {
     return this.connection;
   }
 
-  public async executeQuery(query: string): Promise<any[]> {
+  public async executeQuery(query: string, values: any[]): Promise<any[]> {
     const client = await this.connection.connect();
     try {
       const res = await client.query(query);
@@ -28,7 +27,7 @@ export class DatabaseConnection {
     }
   }
 
-  public async executeNonQuery(query: string): Promise<void> {
+  public async executeNonQuery(query: string, values: any[]): Promise<void> {
     const client = await this.connection.connect();
     try {
       await client.query(query);

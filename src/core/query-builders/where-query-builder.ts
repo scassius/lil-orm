@@ -25,7 +25,7 @@ export class WhereQueryBuilder<T> {
     );
   }
 
-  finalize() {
+  getQueryBuilder() {
     return this.queryBuilder;
   }
 }

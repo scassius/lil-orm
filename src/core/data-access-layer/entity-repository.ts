@@ -1,4 +1,3 @@
-import { EntityTransformer } from "../entity-transformer";
 import { MetadataExtractor } from "../metadata/metadata-extractor";
 import { SQLiteDatabase } from "../database/sqlite-provider";
 import { Transaction } from "./transaction";
@@ -12,11 +11,15 @@ import { WhereQueryBuilder } from "../query-builders/where-query-builder";
 import { UpdateQueryBuilder } from "../query-builders/update-query-builder";
 import { DeleteQueryBuilder } from "../query-builders/delete-query-builder";
 import { QueryCondition } from "../query-builders/query-condition";
+import { DBSMType } from "../types";
+import { EntityTransformer } from "../entity-transformers/entity-transformer";
+import { EntityTransformerFactory } from "../entity-transformers/entity-transformer-factory";
 
 export class Repository<TEntity> {
   private readonly _tableName: string;
   private dataAccessLayer: DataAccessLayer;
   private queryBuilder: QueryBuilderAPI;
+  private entityTransformer: EntityTransformer;
 
   public debugSQLQuery: string = "";
   public debugMode: boolean = false;
@@ -25,11 +28,13 @@ export class Repository<TEntity> {
     private readonly entityModel: new () => TEntity extends object
       ? TEntity
       : any,
-    private readonly db: DatabaseConnection
+    private readonly db: DatabaseConnection,
+    private readonly dbsm: DBSMType
   ) {
     this._tableName = MetadataExtractor.getEntityTableName(entityModel);
     this.dataAccessLayer = new DataAccessLayer(this.db);
-    this.queryBuilder = new QueryBuilderAPI();
+    this.queryBuilder = new QueryBuilderAPI(this.dbsm);
+    this.entityTransformer = EntityTransformerFactory.create(dbsm)
   }
 
   get dbInstance(): DatabaseConnection {
@@ -52,9 +57,9 @@ export class Repository<TEntity> {
       queryBuilder: WhereQueryBuilder<TEntity>
     ) => QueryCondition<TEntity, keyof TEntity>
   ): Promise<TEntity[]> {
-    const initialQueryBuilder = new QueryBuilderAPI()
+    const initialQueryBuilder = new QueryBuilderAPI(this.dbsm)
       .forEntity(this.entityModel)
-      .finalize();
+      .getQueryBuilder();
     const whereQueryBuilder = new WhereQueryBuilder<TEntity>(
       this.entityModel,
       initialQueryBuilder
@@ -67,7 +72,7 @@ export class Repository<TEntity> {
     const results = await this.dataAccessLayer.retrieve(
       finalizedQueryBuilder.finalize(),
       (data) =>
-        EntityTransformer.sqlEntityToObj<TEntity>(new this.entityModel(), data)
+        this.entityTransformer.sqlEntityToObj<TEntity>(new this.entityModel(), data)
     );
 
     return results;

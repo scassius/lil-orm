@@ -26,7 +26,7 @@ export class DeleteQueryBuilder<T> {
       this.queryBuilder
     );
     const queryCondition = whereQueryBuilder.where(propertySelector);
-    this.whereConditions.push(queryCondition.build());
+    this.whereConditions.push(queryCondition.build().query);
     return queryCondition;
   }
 

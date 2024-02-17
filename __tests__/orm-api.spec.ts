@@ -8,7 +8,7 @@ describe('LilORM API', () => {
 
     beforeEach(async () => {
         const connectionString = ':memory:';
-        lilOrm = new LilORM(connectionString);
+        lilOrm = new LilORM(connectionString, 'sqlite');
         await lilOrm.createTable(UserEntity);
 
         const userEntity = new UserEntity();

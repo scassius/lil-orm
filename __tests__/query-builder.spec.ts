@@ -7,13 +7,13 @@ describe("QueryBuilderAPI", () => {
   let queryBuilder: QueryBuilderAPI;
 
   beforeEach(() => {
-    queryBuilder = new QueryBuilderAPI();
+    queryBuilder = new QueryBuilderAPI('sqlite');
   });
 
   it("should build a simple select query", () => {
-    const query = queryBuilder.forEntity(UserEntity).finalize().build();
+    const query = queryBuilder.forEntity(UserEntity).getQueryBuilder().build();
 
-    expect(query?.trim()).toBe("SELECT * FROM users");
+    expect(query?.query.trim()).toBe("SELECT * FROM users");
   });
 
   it("should build a simple where query", () => {

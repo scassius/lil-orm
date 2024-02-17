@@ -1,5 +1,6 @@
-import { EntityTransformer } from "../entity-transformer";
-import { PropertyMapping, valueQueryFormatter } from "./proprety-mapping";
+import { LilORMType } from "../types";
+import { SQLValue } from "./api-query-language";
+import { PropertyMapping } from "./proprety-mapping";
 import { WhereQueryBuilder } from "./where-query-builder";
 
 export class QueryCondition<T, K extends keyof T> {
@@ -20,27 +21,14 @@ export class QueryCondition<T, K extends keyof T> {
     const mapping = this.propertyMappings.find(
       (mappingItem) => mappingItem.entityProperty === this.property
     );
-    return `${this.tableName}.${
-      mapping ? mapping.columnName : String(this.property)
-    }`;
-  }
-
-  private isJSONType(): boolean {
-    const type = this.propertyMappings.find(
-      (mapping) => mapping.entityProperty === this.property
-    )?.columnType;
-
-    return type === "JSON"; // Assumi che "JSON" sia il valore che stai usando per rappresentare il tipo di colonna JSON.
+    return `${this.tableName}.${mapping ? mapping.columnName : String(this.property)
+      }`;
   }
 
   equals(value: T[K]): QueryCondition<T, K> {
     const columnName = this.getColumnName();
 
-    if (this.isJSONType()) {
-      this.whereClauses.push(`${columnName} @> ${this.formatValue(value)}`);
-    } else {
-      this.whereClauses.push(`${columnName} = ${this.formatValue(value)}`);
-    }
+    this.whereClauses.push(`${columnName} = ${this.formatValue(value)}`);
 
     return this;
   }
@@ -95,32 +83,25 @@ export class QueryCondition<T, K extends keyof T> {
     propertySelector: K2
   ): QueryCondition<T, K2> {
     const newCondition = this.builder.where(propertySelector);
-    this.builder.finalize().internal.addWhereClause(this.buildCondition());
+    this.builder.getQueryBuilder().internal.addWhereClause(this.buildCondition());
     return newCondition;
   }
 
   or<K2 extends keyof T & string>(propertySelector: K2): QueryCondition<T, K2> {
     const newCondition = this.builder.where(propertySelector);
-    this.builder.finalize().internal.addOrWhereClause(this.buildOrCondition());
+    this.builder.getQueryBuilder().internal.addOrWhereClause(this.buildOrCondition());
     return newCondition;
   }
 
   private formatValue(value: any): string {
-    const type =
-      this.propertyMappings.find(
-        (mapping) => mapping.entityProperty === this.property
-      )?.columnType || "TEXT";
+    const type = this.propertyMappings.find(
+      (mapping) => mapping.entityProperty === this.property
+    )?.columnType;
 
-    const formattedValue = EntityTransformer.formatValueToPostgreSQLType(
-      value,
-      type
-    );
-
-    if (this.isJSONType()) {
-      return `${formattedValue}::jsonb`;
-    }
-
-    return formattedValue;
+    const queryBuilder = this.builder.getQueryBuilder();
+    queryBuilder.internal.addValues(value);
+    const placeholder = queryBuilder.internal.getDBSMImpl().preparedStatementPlaceholder(queryBuilder.getValues().length, type as LilORMType);
+    return placeholder;
   }
 
   private buildCondition(): string {
@@ -133,12 +114,13 @@ export class QueryCondition<T, K extends keyof T> {
 
   finalize() {
     return this.builder
-      .finalize()
+      .getQueryBuilder()
       .internal.addWhereClause(this.buildCondition());
   }
 
-  build(): string {
-    this.builder.finalize().internal.addWhereClause(this.buildCondition());
-    return this.builder.finalize().build();
+  build(): { query: string, values: SQLValue[] } {
+    this.builder.getQueryBuilder().internal.addWhereClause(this.buildCondition());
+    const preparedQuery = this.builder.getQueryBuilder().build();
+    return { query: preparedQuery.query, values: preparedQuery.values };
   }
 }

@@ -1,7 +1,5 @@
 import { DatabaseConnection } from "../database/database-connection";
-import { EntityTransformer } from "../entity-transformer";
 import {
-  OperationType,
   QueryBuilderAPI,
 } from "../query-builders/api-query-language";
 
@@ -17,22 +15,22 @@ export class DataAccessLayer {
     entityMapper: (data: any) => T
   ): Promise<T[]> {
     const query = queryBuilder.build();
-    const queryResult = await this.database.executeQuery(query);
+    const queryResult = await this.database.executeQuery(query.query, query.values);
     return queryResult.map(entityMapper);
   }
 
   public async insert(queryBuilder: QueryBuilderAPI): Promise<void> {
     const query = queryBuilder.build();
-    await this.database.executeNonQuery(query);
+    await this.database.executeNonQuery(query.query, query.values);
   }
 
   public async update(queryBuilder: QueryBuilderAPI): Promise<void> {
     const query = queryBuilder.build();
-    await this.database.executeNonQuery(query);
+    await this.database.executeNonQuery(query.query, query.values);
   }
 
   public async delete(queryBuilder: QueryBuilderAPI): Promise<void> {
     const query = queryBuilder.build();
-    await this.database.executeNonQuery(query);
+    await this.database.executeNonQuery(query.query, query.values);
   }
 }

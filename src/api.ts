@@ -1,11 +1,10 @@
 import { Repository } from "./core";
 import { DataAccessLayer } from "./core/data-access-layer/data-access-layer";
 import { DatabaseConnection } from "./core/database/database-connection";
-import { EntityTransformer } from "./core/entity-transformer";
 import { MapperAPI } from "./core/mapper-api";
 import { QueryBuilderAPI } from "./core/query-builders/api-query-language";
-import { CreateTableQueryBuilder } from "./core/schema-generator/create-table-query-builder";
 import { SchemaGenerator } from "./core/schema-generator/schema-generator";
+import { DBSMType } from "./core/types";
 
 /**
  * TODO:
@@ -25,13 +24,13 @@ export class LilORM {
    * Creates an instance of LilORM.
    * @param {string} databaseString - The connection string or file path of the SQLite database.
    */
-  constructor(private readonly databaseString: string) {
+  constructor(private readonly databaseString: string, private readonly driver: DBSMType) {
     this.databaseConnection = new DatabaseConnection(
       this.databaseString,
-      "postgresql"
+      driver
     );
     this.dataAccessLayer = new DataAccessLayer(this.databaseConnection);
-    this._schemaGenerator = new SchemaGenerator(this.databaseConnection);
+    this._schemaGenerator = new SchemaGenerator(this.databaseConnection, driver);
     this.mapper = new MapperAPI();
   }
 
@@ -39,7 +38,7 @@ export class LilORM {
     conditionBuilder: (queryBuilder: QueryBuilderAPI) => QueryBuilderAPI,
     entityMapper: (data: any) => TEntity
   ): Promise<TEntity[]> {
-    const initialQueryBuilder = new QueryBuilderAPI();
+    const initialQueryBuilder = new QueryBuilderAPI(this.driver);
 
     const finalizedQueryBuilder = conditionBuilder(initialQueryBuilder);
 
@@ -52,7 +51,7 @@ export class LilORM {
   }
 
   /**
-   * Creates a table for the specified entity in the SQLite database.
+   * Creates a table for the specified entity in the PostregSQL database.
    * @param {object} entityClass - The class representing the entity.
    * @returns {Promise<void>} A Promise that resolves when the table is created.
    */
@@ -68,7 +67,7 @@ export class LilORM {
   getRepository<TEntity>(
     entityClass: new () => TEntity extends object ? TEntity : any
   ): Repository<TEntity> {
-    return new Repository<TEntity>(entityClass, this.databaseConnection);
+    return new Repository<TEntity>(entityClass, this.databaseConnection, this.driver);
   }
 
   /**
@@ -82,7 +81,7 @@ export class LilORM {
       FROM information_schema.tables 
       WHERE table_schema='public' 
       AND table_name='${tableName}'`;
-    const res = await this.databaseConnection.executeQuery(query);
+    const res = await this.databaseConnection.executeQuery(query, []);
     return res.length > 0;
   }
 

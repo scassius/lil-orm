@@ -1,6 +1,4 @@
 import * as sqlite3 from "sqlite3";
-import { EntityTransformer } from "../entity-transformer";
-import { EntityType } from "../types";
 
 export interface Result<T> {
   rows: T[];
@@ -18,9 +16,9 @@ export class SQLiteDatabase {
     return this.db;
   }
 
-  run(query: string): Promise<void> {
+  run(query: string, values: any[]): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.db.run(query, (error) => {
+      this.db.run(query, values, (error) => {
         if (error) {
           reject(error);
         } else {
@@ -30,9 +28,9 @@ export class SQLiteDatabase {
     });
   }
 
-  query(query: string): Promise<any[]> {
+  query(query: string, values: any[]): Promise<any[]> {
     return new Promise((resolve, reject) => {
-      this.db.all(query, (error, rows) => {
+      this.db.all(query, values, (error, rows) => {
         if (error) {
           reject(error);
         } else {

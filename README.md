@@ -46,37 +46,37 @@ class UserEntity {
     autoIncrement: true,
   })
   @Column({
-    type: 'INTEGER',
+    type: 'integer',
     name: 'id',
   })
   id: number;
 
   @Column({
-    type: 'TEXT',
+    type: 'text',
     name: 'name',
   })
   name: string;
 
   @Column({
-    type: 'TEXT',
+    type: 'text',
     name: 'email',
   })
   email: string;
 
   @Column({
-    type: 'JSON',
+    type: 'json',
     name: 'config',
   })
   config: any;
 
   @Column({
-    type: 'BOOLEAN',
+    type: 'boolean',
     name: 'is_active',
   })
   isActive: boolean;
 
   @Column({
-    type: 'DATE',
+    type: 'date',
     name: 'created_at',
   })
   createdAt: Date;

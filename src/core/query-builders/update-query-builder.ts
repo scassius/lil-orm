@@ -1,6 +1,5 @@
 import { MetadataExtractor } from "../metadata/metadata-extractor";
 import { QueryBuilderAPI, OperationType } from "./api-query-language";
-import { valueQueryFormatter } from "./proprety-mapping";
 import { QueryCondition } from "./query-condition";
 import { WhereQueryBuilder } from "./where-query-builder";
 
@@ -22,15 +21,18 @@ export class UpdateQueryBuilder<T> {
     const columns: any[] =
       MetadataExtractor.getEntityColumnsName(entityInstance);
 
-    const setClause: any[] = [];
+      const filteredValues: any[] = [];
+      const filteredColumns: any[] = [];
 
     for (let i = 0; i < values.length; i++) {
       if (values[i] !== undefined && !Number.isNaN(values[i])) {
-        setClause.push(`${columns[i]} = ${values[i]}`);
+        filteredColumns.push(columns[i]);
+        filteredValues.push(values[i]);
       }
     }
 
-    this.queryBuilder.internal.setSetClauses(setClause);
+    this.queryBuilder.internal.setValues(filteredValues);
+    this.queryBuilder.internal.setColumns(filteredColumns);
 
     return this;
   }

@@ -1,8 +1,12 @@
 import { MetadataExtractor } from "../metadata/metadata-extractor";
+import { DBSMType } from "../types";
 import { DeleteQueryBuilder } from "./delete-query-builder";
 import { InsertQueryBuilder } from "./insert-query-builder";
+import { SQLBuilderFactory } from "../sql-builders-implementation/sql-builder-factory";
+import { SQLBuilderImpl } from "../sql-builders-implementation/sql-builder-implementation";
 import { UpdateQueryBuilder } from "./update-query-builder";
 import { WhereQueryBuilder } from "./where-query-builder";
+import { EntityTransformer } from "../entity-transformers/entity-transformer";
 
 export enum OperationType {
   Select = "SELECT",
@@ -10,6 +14,8 @@ export enum OperationType {
   Update = "UPDATE",
   DeleteFrom = "DELETE FROM",
 }
+
+export type SQLValue = string | number | boolean | Date | null;
 
 export class QueryBuilderAPI {
   private operationType: OperationType | null;
@@ -21,20 +27,27 @@ export class QueryBuilderAPI {
   private groupByColumns: string[];
   private columns: string[];
   private values: any[];
-  private setClauses: string[];
   private logicOperators: string[];
+  private sqlBuilderImpl: SQLBuilderImpl;
+  private entityTransfomer: EntityTransformer;
 
   public internal: {
     setColumns: (columns: string[]) => QueryBuilderAPI;
-    setValues: (values: string[]) => QueryBuilderAPI;
-    setSetClauses: (setClauses: string[]) => QueryBuilderAPI;
+    setValues: (values: any[]) => QueryBuilderAPI;
+    addValues: (values: any[]) => QueryBuilderAPI;
     setOperationType: (operationType: OperationType) => QueryBuilderAPI;
     addOrWhereClause: (orWhereClause: string) => QueryBuilderAPI;
     addWhereClause: (whereClause: string) => QueryBuilderAPI;
+    getDBSMImpl: () => SQLBuilderImpl;
   };
 
-  constructor() {
+  getValues() {
+    return this.values;
+  }
+
+  constructor(private readonly dbsmType: DBSMType) {
     this.intialize();
+    this.sqlBuilderImpl = SQLBuilderFactory.create(dbsmType);
   }
 
   private intialize() {
@@ -44,7 +57,6 @@ export class QueryBuilderAPI {
     this.sortDirection = null;
     this.groupByColumns = [];
     this.operationType = null;
-    this.setClauses = [];
     this.columns = [];
     this.values = [];
     this.logicOperators = [];
@@ -56,12 +68,12 @@ export class QueryBuilderAPI {
         self.columns = columns;
         return self;
       },
-      setValues(values: string[]): QueryBuilderAPI {
+      setValues(values: any[]): QueryBuilderAPI {
         self.values = values;
         return self;
       },
-      setSetClauses(setClauses: string[]): QueryBuilderAPI {
-        self.setClauses = setClauses;
+      addValues(values: any[]): QueryBuilderAPI {
+        self.values.push(values);
         return self;
       },
       setOperationType(operationType: OperationType): QueryBuilderAPI {
@@ -82,6 +94,9 @@ export class QueryBuilderAPI {
         }
         return self;
       },
+      getDBSMImpl(): SQLBuilderImpl {
+        return self.sqlBuilderImpl;
+      }
     };
   }
 
@@ -89,7 +104,7 @@ export class QueryBuilderAPI {
     this.intialize();
   }
 
-  forEntity<T>(
+  public forEntity<T>(
     entityClass: new () => T extends object ? T : any,
     operationType: OperationType = OperationType.Select
   ): WhereQueryBuilder<T> {
@@ -100,21 +115,21 @@ export class QueryBuilderAPI {
     return new WhereQueryBuilder(entityClass, this);
   }
 
-  insertInto<T>(
+  public insertInto<T>(
     entityClass: new () => T extends object ? T : any
   ): InsertQueryBuilder<T> {
     this.operationType = OperationType.InsertInto;
     return new InsertQueryBuilder(entityClass, this);
   }
 
-  update<T>(
+  public update<T>(
     entityClass: new () => T extends object ? T : any
   ): UpdateQueryBuilder<T> {
     this.operationType = OperationType.Update;
     return new UpdateQueryBuilder(entityClass, this);
   }
 
-  deleteFrom<T>(
+  public deleteFrom<T>(
     entityClass: new () => T extends object ? T : any
   ): DeleteQueryBuilder<T> {
     this.operationType = OperationType.DeleteFrom;
@@ -126,7 +141,8 @@ export class QueryBuilderAPI {
     return this;
   }
 
-  build(): string {
+  build(): { query: string, values: SQLValue[] } {
+    let values: SQLValue[] = [];
     let fromClause = "";
     const whereClause = this.whereClauses.reduce((acc, clause, i) => {
       if (i === 0) return clause;
@@ -155,14 +171,17 @@ export class QueryBuilderAPI {
       case OperationType.InsertInto:
         fromClause = this.entityQueries[0];
         const columnsClause = `(${this.columns.join(", ")})`;
-        const valuesClause = `VALUES (${this.values.join(", ")})`;
+        const placeholders = this.values.map((_, index) => `$${index + 1}`).join(", ");
+        const valuesClause = `VALUES (${placeholders})`;
         buildStr = `INSERT INTO ${fromClause} ${columnsClause} ${valuesClause}`;
+        values = [...this.values];
         break;
 
       case OperationType.Update:
         fromClause = this.entityQueries[0];
-        const setClause = `SET ${this.setClauses.join(", ")}`;
-        buildStr = `UPDATE ${fromClause} ${setClause} ${whereClauseStr}`;
+        const setClause = this.columns.map((clause, index) => `${clause} = $${index + 1}`).join(", ");
+        buildStr = `UPDATE ${fromClause} SET ${setClause} ${whereClauseStr}`;
+        values = [...this.values];
         break;
 
       case OperationType.DeleteFrom:
@@ -174,6 +193,6 @@ export class QueryBuilderAPI {
         throw new Error("Invalid operation type");
     }
     this.dispose();
-    return buildStr;
+    return { query: buildStr, values: values};
   }
 }

@@ -1,7 +1,5 @@
-import { Client } from "pg";
 import { MetadataExtractor } from "../metadata/metadata-extractor";
 import { LilORMType } from "../types";
-import { TypesHelper } from "../types-helper";
 
 export interface PropertyMapping<T> {
   entityProperty: string;
@@ -32,25 +30,4 @@ export function getPropertyMappings<T>(
   }
 
   return propertyMappings;
-}
-
-export function valueQueryFormatter(value: any): string {
-  if (value === null) return `NULL`;
-  if (TypesHelper.isString(value)) return `${escapeValue(value)}`;
-  if (TypesHelper.isDate(value)) return `'${value.toISOString()}'`; // Convert to ISO string
-  if (TypesHelper.isBoolean(value)) return value ? "true" : "false";
-  if (TypesHelper.isNumber(value)) return value.toString();
-  if (TypesHelper.isJSONObject(value)) return `${escapeJSONForSQL(value)}`;
-  throw new Error("Not supported type");
-}
-
-export function escapeValue(value: any): any {
-  const escaped = value.replace(/'/g, "''");
-  return `'${escaped}'`;
-}
-
-export function escapeJSONForSQL(json: object): string {
-  const jsonString = JSON.stringify(json);
-  const escapedJSON = jsonString.replace(/'/g, "''");
-  return `'${escapedJSON}'`;
 }

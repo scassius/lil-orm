@@ -1,4 +1,4 @@
-import { LilORMType, OrmTypesToPostgreSQLMap, PostgreSQLType } from "../types";
+import { LilORMType, OrmTypesToPostgreSQLMap, PostgreSQLType } from "../type-maps/sqlite-types";
 import { SQLBuilderImpl } from "./sql-builder-implementation";
 
 export class PostgreSQLBuilder extends SQLBuilderImpl {

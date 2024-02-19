@@ -7,7 +7,7 @@ describe('LilORM API', () => {
     let lilOrm: LilORM;
 
     beforeEach(async () => {
-        const connectionString = './test.sqlite3';
+        const connectionString = ':memory:';
         lilOrm = new LilORM(connectionString, 'sqlite');
         await lilOrm.createTable(UserEntity);
 
@@ -23,7 +23,7 @@ describe('LilORM API', () => {
         const repository = lilOrm.getRepository(UserEntity);
         repository.debugMode = true;
 
-        //await repository.insert(userEntity);
+        await repository.insert(userEntity);
     });
 
     it('should build a query and retive an object', async () => {

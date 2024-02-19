@@ -1,4 +1,4 @@
-import { LilORMType } from "../types";
+import { LilORMType } from "../type-maps/lil-orm-types";
 import { SQLValue } from "./api-query-language";
 import { PropertyMapping } from "./proprety-mapping";
 import { WhereQueryBuilder } from "./where-query-builder";

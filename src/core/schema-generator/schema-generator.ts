@@ -1,5 +1,5 @@
 import { DatabaseConnection } from "../database/database-connection";
-import { DBSMType } from "../types";
+import { DBSMType } from "../type-maps/lil-orm-types";
 import { CreateTableQueryBuilder } from "./create-table-query-builder";
 import { PgCreateTableQueryBuilder } from "./pg-create-table-query-builder";
 import { SQLiteCreateTableQueryBuilder } from "./sqlite-create-table-query-builder";

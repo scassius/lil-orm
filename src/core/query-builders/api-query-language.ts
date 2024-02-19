@@ -1,5 +1,5 @@
 import { MetadataExtractor } from "../metadata/metadata-extractor";
-import { DBSMType, LilORMType } from "../types";
+import { DBSMType, LilORMType } from "../type-maps/lil-orm-types";
 import { DeleteQueryBuilder } from "./delete-query-builder";
 import { InsertQueryBuilder } from "./insert-query-builder";
 import { SQLBuilderFactory } from "../sql-builders-implementation/sql-builder-factory";

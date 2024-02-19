@@ -5,7 +5,7 @@ import { DatabaseConnectionFactory } from "./core/database/database-connection-f
 import { MapperAPI } from "./core/mapper-api";
 import { QueryBuilderAPI } from "./core/query-builders/api-query-language";
 import { SchemaGenerator } from "./core/schema-generator/schema-generator";
-import { DBSMType } from "./core/types";
+import { DBSMType } from "./core/type-maps/lil-orm-types";
 
 /**
  * TODO:

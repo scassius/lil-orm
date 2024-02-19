@@ -2,7 +2,7 @@ import { ColumnOpts, PrimaryKeyOpts } from "../decorators";
 import { PRIMARY_KEY_METADATA_KEY } from "../metadata/constants";
 import { MetadataExtractor } from "../metadata/metadata-extractor";
 import "reflect-metadata";
-import { OrmTypesToSQLiteMap, SQLiteType } from "../types"; // Questo dovrebbe essere adattato per SQLite
+import { OrmTypesToSQLiteMap, SQLiteType } from "../type-maps/sqlite-types"; // Questo dovrebbe essere adattato per SQLite
 import { CreateTableQueryBuilder } from "./create-table-query-builder";
 
 export class SQLiteCreateTableQueryBuilder implements CreateTableQueryBuilder {

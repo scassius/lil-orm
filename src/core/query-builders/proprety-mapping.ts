@@ -1,5 +1,5 @@
 import { MetadataExtractor } from "../metadata/metadata-extractor";
-import { LilORMType } from "../types";
+import { LilORMType } from "../type-maps/lil-orm-types";
 
 export interface PropertyMapping<T> {
   entityProperty: string;

@@ -6,7 +6,7 @@ import {
   ON_UPDATE_METADATA_KEY,
   PRIMARY_KEY_METADATA_KEY,
 } from "./metadata/constants";
-import { LilORMType } from "./types";
+import { LilORMType } from "./type-maps/lil-orm-types";
 
 /**
  * @interface ColumnOpts

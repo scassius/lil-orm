@@ -6,8 +6,8 @@ import {
   PRIMARY_KEY_METADATA_KEY,
 } from "./constants";
 import { ColumnOpts } from "../decorators";
-import { ColumnMetadata, LilORMType } from "../types";
-import { TypesHelper } from "../types-helper";
+import { ColumnMetadata, LilORMType } from "../type-maps/lil-orm-types";
+import { TypesHelper } from "../type-maps/types-helper";
 import { EntityTransformer } from "../../entity-transformer";
 
 export class MetadataExtractor {

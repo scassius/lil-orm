@@ -1,4 +1,4 @@
-import { LilORMType } from "../types";
+import { LilORMType } from "../type-maps/sqlite-types";
 import { SQLBuilderImpl } from "./sql-builder-implementation";
 
 export class SQLiteBuilder extends SQLBuilderImpl {

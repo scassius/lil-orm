@@ -1,4 +1,4 @@
-import { DBSMType } from "../types";
+import { DBSMType } from "../type-maps/lil-orm-types";
 import { DatabaseConnection } from "./database-connection";
 import { PostgreSQLProvider } from "./postgresql-provider";
 import { SQLiteProvider } from "./sqlite-provider";

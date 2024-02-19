@@ -8,7 +8,7 @@ import { DatabaseConnection } from "../database/database-connection";
 import { WhereQueryBuilder } from "../query-builders/where-query-builder";
 import { UpdateQueryBuilder } from "../query-builders/update-query-builder";
 import { QueryCondition } from "../query-builders/query-condition";
-import { DBSMType } from "../types";
+import { DBSMType } from "../type-maps/lil-orm-types";
 import { EntityTransformer } from "../../entity-transformer";
 import _ from 'lodash';
 

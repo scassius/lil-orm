@@ -1,4 +1,4 @@
-import { DBSMType } from "../type-maps/sqlite-types";
+import { DBSMType } from "../type-maps/lil-orm-types";
 import { PostgreSQLBuilder } from "./postgresql-builder";
 import { SQLBuilderImpl } from "./sql-builder-implementation";
 import { SQLiteBuilder } from "./sqlite-builder";

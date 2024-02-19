@@ -1,5 +1,6 @@
 import { Repository } from "./core";
 import { DataAccessLayer } from "./core/data-access-layer/data-access-layer";
+import { Transaction } from "./core/data-access-layer/transaction";
 import { DatabaseConnection } from "./core/database/database-connection";
 import { DatabaseConnectionFactory } from "./core/database/database-connection-factory";
 import { MapperAPI } from "./core/mapper-api";
@@ -21,6 +22,8 @@ export class LilORM {
   private readonly _schemaGenerator: SchemaGenerator;
   private readonly mapper: MapperAPI;
 
+  public readonly transaction: Transaction;
+
   /**
    * Creates an instance of LilORM.
    * @param {string} databaseString - The connection string or file path of the SQLite database.
@@ -30,6 +33,7 @@ export class LilORM {
     this.dataAccessLayer = new DataAccessLayer(this.databaseConnection);
     this._schemaGenerator = new SchemaGenerator(this.databaseConnection, driver);
     this.mapper = new MapperAPI();
+    this.transaction = new Transaction(this.databaseConnection);
   }
 
   async retrieve<TEntity>(

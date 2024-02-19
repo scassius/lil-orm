@@ -41,7 +41,7 @@ export class PgCreateTableQueryBuilder implements CreateTableQueryBuilder {
 
       if (propertyMetadata) {
         const columnName = propertyMetadata.name || propertyKey.toString();
-        const columnNotNull = !propertyMetadata?.nullable || false;
+        const columnNotNull = !propertyMetadata?.nullable;
         const columnType = OrmTypesToPostgreSQLMap[
           propertyMetadata.type
         ] as PostgreSQLType;

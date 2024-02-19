@@ -13,9 +13,10 @@ export interface ColumnMetadata {
     value: string | number;
 }
 
-type TypeScriptType =
+export type TypeScriptType =
     | "number"
     | "string"
+    | "bigint"
     | "boolean"
     | "Date"
     | "Array<any>"
@@ -45,7 +46,7 @@ export type LilORMType =
     | "money";
 
 
-const lilORMToTypeScript: { [key in LilORMType]: TypeScriptType } = {
+export const lilORMToTypeScript: { [key in LilORMType]: TypeScriptType } = {
     integer: "number",
     text: "string",
     real: "number",
@@ -67,3 +68,14 @@ const lilORMToTypeScript: { [key in LilORMType]: TypeScriptType } = {
     bit: "number",
     money: "number",
 };
+
+export const TypeScriptToLilORMMap: Record<TypeScriptType, LilORMType> = {
+    number: "integer",
+    bigint: "integer",
+    string: "text",
+    boolean: "boolean",
+    Date: "timestamp",
+    "Array<any>": "array",
+    Buffer: "blob",
+    any: "json"
+  };

@@ -11,15 +11,26 @@ Please note: Lil ORM is currently not recommended for use in production environm
 
 # Changelog
 
+## Version 3.0.0
+
+### Security Enhancements
+- Introduced **prepared statements** to enhance security and performance.
+
+### Features
+- **Multiple DBMS Support**: Now supporting PostgreSQL and SQLite, offering flexibility across different database environments.
+- **JSON Query Support**: New capabilities for querying JSON fields with functions like `jsonEquals` and `jsonContains`.
+- **Expanded Type Support**: Increased range of supported data types.
+- **Lifecycle Hooks**: Added `OnInsert` and `OnUpdate` hooks for custom logic during data operations.
+
+### Changes
+- **API Overhaul**: Many APIs have been changed or updated to improve usability and efficiency. Check the documentation for migration guides.
+
 ## Version 2.0.0
 
 ### Added
 - Default database changed to PostgreSQL.
 - Support for specifying `SELECT` clauses.
 - Ability to extract queries from repository for debugging.
-
-### Removed
-- SQLite support as default database.
 
 ### Planned Features
 - **Integrated Complex Query Language**: Implement an integrated language for constructing complex queries, enhancing the ORM's ability to handle sophisticated data retrieval and manipulation scenarios.
@@ -31,11 +42,15 @@ Please note: Lil ORM is currently not recommended for use in production environm
 # Install 
 
 ```shell
-npm i lil-orm
+npm i lil-orm pg
+```
+```shell
+npm i lil-orm sqlite3
 ```
 
 ```shell
-yarn add lil-orm
+yarn add lil-orm pg
+yarn add lil-orm sqlite3
 ```
 
 # Define Entity
@@ -75,21 +90,22 @@ class UserEntity {
   })
   isActive: boolean;
 
-  @Column({
-    type: 'date',
-    name: 'created_at',
+ @Column({
+    type: "date",
+    name: "created_at",
   })
+  @OnInsert(() => new Date())
   createdAt: Date;
+
+  @Column({
+    type: "date",
+    name: "updated_at",
+  })
+  @OnInsert(() => new Date())
+  @OnUpdate(() => new Date())
+  updatedAt: Date;
 }
 ```
-supported types:
- - TEXT
- - INTEGER
- - REAL
- - BOOLEAN
- - DATE (ISO Format)
- - JSON
-
  
 ⚠️ **Warning: Important Configuration Required**
 
@@ -194,6 +210,39 @@ let user: any[] = lilOrm.retrieve<UserEntity>(
             (data) => data)
 ```
 
-# Transactions
+# `@OnInsert` and `@OnUpdate` Hooks
 
-TO-DO
+## `@OnInsert`
+
+Executes custom logic before a new entity is saved. Commonly used to set creation timestamps.
+
+```typescript
+@Column({ type: "date", name: "created_at" })
+@OnInsert(() => new Date())
+createdAt: Date;
+```
+
+## `@OnUpdate`
+
+Triggered automatically before an existing entity is updated. Typically used for updating modification timestamps.
+
+```typescript
+@Column({ type: "date", name: "updated_at" })
+@OnUpdate(() => new Date())
+updatedAt: Date;
+```
+
+## Debugging with `enableDebugMode`
+
+To assist in debugging and optimizing your SQL queries, you can enable a debug mode on your ORM repository instances. This mode logs the last SQL query executed, allowing you to review the raw SQL sent to the database.
+
+### Enabling Debug Mode
+
+```typescript
+const repository = lilOrm.getRepository(UserEntity);
+repository.enableDebugMode();
+```
+
+### Note
+
+Debug mode is intended for development and debugging purposes. Ensure it is disabled in production environments to avoid performance overhead and potential security risks.

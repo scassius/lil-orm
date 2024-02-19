@@ -17,8 +17,7 @@ export class UserEntity {
 
   //@ts-ignore
   @Column({
-    type: "text",
-    name: "name",
+    type: "text"
   })
   name: string;
 
@@ -34,6 +33,7 @@ export class UserEntity {
   @Column({
     type: "json",
     name: "config",
+    nullable: true
   })
   config: any;
 
@@ -41,6 +41,7 @@ export class UserEntity {
   @Column({
     type: "boolean",
     name: "is_active",
+    nullable: true
   })
   isActive: boolean;
 
@@ -64,8 +65,14 @@ export class UserEntity {
   //@ts-ignore
   @Column({
     type: "integer",
-    name: "age",
+    nullable: true
   })
-  age: number;
+  permission: number;
+
+  @Column({
+    type: "money",
+    nullable: true
+  })
+  income: number;
 }
 /* tslint:disable:comment-format */

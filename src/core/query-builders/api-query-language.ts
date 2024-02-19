@@ -34,8 +34,8 @@ export class QueryBuilderAPI {
 
   public internal: {
     setColumns: (columns: string[]) => QueryBuilderAPI;
-    setValues: (values: any[]) => QueryBuilderAPI;
-    addValues: (values: any[]) => QueryBuilderAPI;
+    setValues: (values: any[], type: LilORMType[]) => QueryBuilderAPI;
+    addValues: (values: any[], type: LilORMType[]) => QueryBuilderAPI;
     setOperationType: (operationType: OperationType) => QueryBuilderAPI;
     addOrWhereClause: (orWhereClause: string) => QueryBuilderAPI;
     addWhereClause: (whereClause: string) => QueryBuilderAPI;
@@ -69,12 +69,13 @@ export class QueryBuilderAPI {
         self.columns = columns;
         return self;
       },
-      setValues(values: any[]): QueryBuilderAPI {
-        self.values = values;
+      setValues(values: any[], types: LilORMType[]): QueryBuilderAPI {
+        self.values = values ? values.map((value, index) => self.sqlBuilderImpl.prepareValue(value, types[index])) : [];
         return self;
       },
-      addValues(values: any[]): QueryBuilderAPI {
-        self.values.push(values);
+      addValues(values: any[], types: LilORMType[]): QueryBuilderAPI {
+        const preparedValues = values ? values.map((value, index) => self.sqlBuilderImpl.prepareValue(value, types[index])) : [];
+        self.values.push(...preparedValues);
         return self;
       },
       setOperationType(operationType: OperationType): QueryBuilderAPI {
@@ -209,7 +210,8 @@ export class QueryBuilderAPI {
         break;
 
       default:
-        throw new Error("Invalid operation type");
+        return { query: whereClauseStr, values: [...this.values]};
+        //throw new Error("Invalid operation type");
     }
     
     this.dispose();

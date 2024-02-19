@@ -7,12 +7,19 @@ export class WhereQueryBuilder<T> {
   private tableName: string;
   private propertyMappings: PropertyMapping<T>[];
 
+  public internal: {
+    entityClass:  new () => T extends object ? T : any
+  }
+
   constructor(
     entityClass: new () => T extends object ? T : any,
     private readonly queryBuilder: QueryBuilderAPI
   ) {
     this.tableName = MetadataExtractor.getEntityTableName(entityClass);
     this.propertyMappings = getPropertyMappings(entityClass);
+    this.internal = {
+      entityClass: entityClass
+    }
   }
 
   where<K extends keyof T & string>(propertySelector: K): QueryCondition<T, K> {

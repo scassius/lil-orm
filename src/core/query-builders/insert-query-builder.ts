@@ -18,21 +18,21 @@ export class InsertQueryBuilder<T> {
 
     MetadataExtractor.processInsert(entityInstance);
 
-    const values = MetadataExtractor.getEntityValues(entityInstance);
-    const columns: any[] =
-      MetadataExtractor.getEntityColumnsName(entityInstance);
+    const metadataValues = MetadataExtractor.getEnrichedEntityColumnsMetadata(entityInstance);
 
     const filteredValues: any[] = [];
     const filteredColumns: any[] = [];
+    const filteredTypes: any[] = [];
 
-    for (let i = 0; i < values.length; i++) {
-      if (values[i] !== undefined && !Number.isNaN(values[i])) {
-        filteredValues.push(values[i]);
-        filteredColumns.push(columns[i]);
+    for (let i = 0; i < metadataValues.length; i++) {
+      if (metadataValues[i].value !== undefined && !Number.isNaN(metadataValues[i].value)) {
+        filteredValues.push(metadataValues[i].value);
+        filteredColumns.push(metadataValues[i].name);
+        filteredTypes.push(metadataValues[i].type);
       }
     }
 
-    this.queryBuilder.internal.setValues(filteredValues);
+    this.queryBuilder.internal.setValues(filteredValues, filteredTypes);
     this.queryBuilder.internal.setColumns(filteredColumns);
 
     return this;

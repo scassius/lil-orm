@@ -11,10 +11,10 @@ import { LilORMType } from "./type-maps/lil-orm-types";
 /**
  * @interface ColumnOpts
  * @description Options for defining a column in the entity.
- * @property {string} [name] - The name of the column.
+ * @property {string} [name] - The name of the column (optional).
  * @property {LilORMType} type - The data type of the column.
  * @property {*} [defaultValue] - The default value for the column.
- * @property {boolean} [notNull] - Indicates if the column is not nullable.
+ * @property {boolean} [nullable] - Indicates if the column is nullable.
  */
 export interface ColumnOpts {
   name?: string;
@@ -77,7 +77,7 @@ export function Column(opts: ColumnOpts): PropertyDecorator {
   return (target: object, propertyKey: string | symbol) => {
     Reflect.defineMetadata(
       COLUMN_METADATA_KEY,
-      { name: opts?.name, type: opts.type, notNull: opts?.nullable },
+      { name: opts?.name, type: opts.type, nullable: opts?.nullable },
       target,
       propertyKey
     );

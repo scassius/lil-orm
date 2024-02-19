@@ -16,9 +16,9 @@ export class Repository<TEntity> {
   private readonly _tableName: string;
   private dataAccessLayer: DataAccessLayer;
   private queryBuilder: QueryBuilderAPI;
+  private debugMode: boolean = false;
 
-  public debugSQLQuery: string = "";
-  public debugMode: boolean = false;
+  public debugSQLQuery: { query: string, values: any }[] = [];
 
   constructor(
     private readonly entityModel: new () => TEntity extends object
@@ -40,10 +40,16 @@ export class Repository<TEntity> {
     return this.tableName;
   }
 
-  private logDebugQuery(queryBuilder: any) {
+  public enableDebugMode() {
+    this.debugMode = true;
+  }
+
+  private logDebugQuery(queryBuilder: QueryBuilderAPI[]) {
     if (this.debugMode) {
       const queryCopy = _.cloneDeep(queryBuilder);
-      this.debugSQLQuery = queryCopy.finalize().build();
+      queryCopy.forEach((query) => {
+        this.debugSQLQuery.push(query.build());
+      })
     }
   }
 
@@ -60,12 +66,12 @@ export class Repository<TEntity> {
       initialQueryBuilder
     );
 
-    const finalizedQueryBuilder = conditionBuilder(whereQueryBuilder);
+    const finalizedQueryBuilder = conditionBuilder(whereQueryBuilder).finalize();
 
-    this.logDebugQuery(finalizedQueryBuilder);
+    this.logDebugQuery([finalizedQueryBuilder]);
 
     const results = await this.dataAccessLayer.retrieve(
-      finalizedQueryBuilder.finalize(),
+      finalizedQueryBuilder,
       (data) =>
         EntityTransformer.sqlEntityToObj<TEntity>(new this.entityModel(), data)
     );
@@ -73,15 +79,22 @@ export class Repository<TEntity> {
     return results;
   }
 
-  public async insert(entityObj: Partial<TEntity>): Promise<void> {
-    const queryBuilder = this.queryBuilder
-      .insertInto<TEntity>(this.entityModel)
-      .setObject(entityObj)
-      .finalize();
+  public async insert(entityOrEntities: Partial<TEntity> | Partial<TEntity>[]): Promise<void> {
+    const entities = Array.isArray(entityOrEntities) ? entityOrEntities : [entityOrEntities];
 
-    this.logDebugQuery(queryBuilder);
+    if (entities.length === 0) {
+      throw new Error("No entities provided for insertion.");
+    }
 
-    await this.dataAccessLayer.insert(queryBuilder);
+    let queries: QueryBuilderAPI[] = [];
+
+    entities.forEach((entityObj, index) => {
+      queries.push(this.queryBuilder.insertInto<TEntity>(this.entityModel).setObject(entityObj).finalize())
+    });
+
+    this.logDebugQuery(queries);
+
+    await this.dataAccessLayer.insert(queries);
   }
 
   public async update(
@@ -95,7 +108,7 @@ export class Repository<TEntity> {
       .setObject(entityObj);
     const queryBuilder = conditionBuilder(whereBuilder).finalize();
 
-    this.logDebugQuery(queryBuilder);
+    this.logDebugQuery([queryBuilder]);
 
     await this.dataAccessLayer.update(queryBuilder);
   }
@@ -111,7 +124,7 @@ export class Repository<TEntity> {
     );
     const queryBuilder = conditionBuilder(whereBuilder).finalize();
 
-    this.logDebugQuery(queryBuilder);
+    this.logDebugQuery([queryBuilder]);
 
     await this.dataAccessLayer.delete(queryBuilder);
   }

@@ -1,6 +1,4 @@
 import { MetadataExtractor } from "../metadata/metadata-extractor";
-import { SQLiteDatabase } from "../database/sqlite-provider";
-import { Transaction } from "./transaction";
 import { DataAccessLayer } from "./data-access-layer";
 import {
   OperationType,
@@ -9,17 +7,15 @@ import {
 import { DatabaseConnection } from "../database/database-connection";
 import { WhereQueryBuilder } from "../query-builders/where-query-builder";
 import { UpdateQueryBuilder } from "../query-builders/update-query-builder";
-import { DeleteQueryBuilder } from "../query-builders/delete-query-builder";
 import { QueryCondition } from "../query-builders/query-condition";
 import { DBSMType } from "../types";
-import { EntityTransformer } from "../entity-transformers/entity-transformer";
-import { EntityTransformerFactory } from "../entity-transformers/entity-transformer-factory";
+import { EntityTransformer } from "../../entity-transformer";
+import _ from 'lodash';
 
 export class Repository<TEntity> {
   private readonly _tableName: string;
   private dataAccessLayer: DataAccessLayer;
   private queryBuilder: QueryBuilderAPI;
-  private entityTransformer: EntityTransformer;
 
   public debugSQLQuery: string = "";
   public debugMode: boolean = false;
@@ -34,7 +30,6 @@ export class Repository<TEntity> {
     this._tableName = MetadataExtractor.getEntityTableName(entityModel);
     this.dataAccessLayer = new DataAccessLayer(this.db);
     this.queryBuilder = new QueryBuilderAPI(this.dbsm);
-    this.entityTransformer = EntityTransformerFactory.create(dbsm)
   }
 
   get dbInstance(): DatabaseConnection {
@@ -47,8 +42,8 @@ export class Repository<TEntity> {
 
   private logDebugQuery(queryBuilder: any) {
     if (this.debugMode) {
-      const queryCopy = structuredClone(queryBuilder);
-      this.debugSQLQuery = queryCopy.build();
+      const queryCopy = _.cloneDeep(queryBuilder);
+      this.debugSQLQuery = queryCopy.finalize().build();
     }
   }
 
@@ -72,7 +67,7 @@ export class Repository<TEntity> {
     const results = await this.dataAccessLayer.retrieve(
       finalizedQueryBuilder.finalize(),
       (data) =>
-        this.entityTransformer.sqlEntityToObj<TEntity>(new this.entityModel(), data)
+        EntityTransformer.sqlEntityToObj<TEntity>(new this.entityModel(), data)
     );
 
     return results;

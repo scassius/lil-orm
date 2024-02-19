@@ -1,22 +1,23 @@
 import * as sqlite3 from "sqlite3";
+import { DatabaseConnection } from "./database-connection";
 
 export interface Result<T> {
   rows: T[];
   count: number;
 }
 
-export class SQLiteDatabase {
+export class SQLiteProvider implements DatabaseConnection {
   private db: sqlite3.Database;
 
-  constructor(database: string) {
-    this.db = new sqlite3.Database(database);
+  constructor(connectionString: string) {
+    this.db = new sqlite3.Database(connectionString);
   }
 
-  get sqliteInstance(): sqlite3.Database {
+  get dbInstance(): sqlite3.Database {
     return this.db;
   }
 
-  run(query: string, values: any[]): Promise<void> {
+  executeNonQuery(query: string, values: any[]): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(query, values, (error) => {
         if (error) {
@@ -28,7 +29,7 @@ export class SQLiteDatabase {
     });
   }
 
-  query(query: string, values: any[]): Promise<any[]> {
+  executeQuery(query: string, values: any[]): Promise<any[]> {
     return new Promise((resolve, reject) => {
       this.db.all(query, values, (error, rows) => {
         if (error) {

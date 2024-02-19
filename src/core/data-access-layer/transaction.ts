@@ -1,26 +1,26 @@
-import { SQLiteDatabase } from "../database/sqlite-provider";
+import { DatabaseConnection } from "../database/database-connection";
 
 export class Transaction {
   private statements: string[];
   /**
    * Creates an instance of Transaction.
-   * @param {SQLiteDatabase} db - The database instance.
+   * @param {DatabaseConnection} db - The database instance.
    */
-  constructor(private readonly db: SQLiteDatabase) {}
+  constructor(private readonly db: DatabaseConnection) {}
 
   /**
    * Begins the transaction.
    */
   begin(): void {
     this.statements = [];
-    this.db.sqliteInstance.exec("BEGIN");
+    this.db.dbInstance.exec("BEGIN");
   }
 
   /**
    * Commits the transaction.
    */
   commit(): void {
-    this.db.sqliteInstance.exec("COMMIT");
+    this.db.dbInstance.exec("COMMIT");
   }
 
   /**
@@ -35,7 +35,7 @@ export class Transaction {
    * Rolls back the transaction.
    */
   rollback(): void {
-    this.db.sqliteInstance.exec("ROLLBACK");
+    this.db.dbInstance.exec("ROLLBACK");
   }
 
   /**
@@ -69,7 +69,7 @@ export class Transaction {
   private executeStatements(): Promise<void> {
     const statements = this.statements.join(";");
     return new Promise((resolve, reject) => {
-      this.db.sqliteInstance.exec(statements, (error: any) => {
+      this.db.dbInstance.exec(statements, (error: any) => {
         if (error) {
           reject(error);
         } else {

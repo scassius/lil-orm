@@ -1,4 +1,4 @@
-import { EntityTransformer } from "./entity-transformer";
+import { EntityTransformer } from "../entity-transformer";
 
 export class MapperAPI {
   /**

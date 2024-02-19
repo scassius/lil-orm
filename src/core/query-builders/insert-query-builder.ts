@@ -15,6 +15,9 @@ export class InsertQueryBuilder<T> {
 
   setObject(object: Partial<T>): InsertQueryBuilder<T> {
     const entityInstance = Object.assign(new this.entityClass(), object);
+
+    MetadataExtractor.processInsert(entityInstance);
+
     const values = MetadataExtractor.getEntityValues(entityInstance);
     const columns: any[] =
       MetadataExtractor.getEntityColumnsName(entityInstance);

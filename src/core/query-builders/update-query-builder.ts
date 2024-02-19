@@ -17,12 +17,15 @@ export class UpdateQueryBuilder<T> {
 
   setObject(object: Partial<T>): UpdateQueryBuilder<T> {
     const entityInstance = Object.assign(new this.entityClass(), object);
+
+    MetadataExtractor.processUpdate(entityInstance);
+
     const values = MetadataExtractor.getEntityValues(entityInstance);
     const columns: any[] =
       MetadataExtractor.getEntityColumnsName(entityInstance);
 
-      const filteredValues: any[] = [];
-      const filteredColumns: any[] = [];
+    const filteredValues: any[] = [];
+    const filteredColumns: any[] = [];
 
     for (let i = 0; i < values.length; i++) {
       if (values[i] !== undefined && !Number.isNaN(values[i])) {

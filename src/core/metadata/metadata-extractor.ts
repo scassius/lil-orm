@@ -1,12 +1,14 @@
 import {
   COLUMN_METADATA_KEY,
   ENTITY_METADATA_KEY,
+  ON_INSERT_METADATA_KEY,
+  ON_UPDATE_METADATA_KEY,
   PRIMARY_KEY_METADATA_KEY,
 } from "./constants";
-import { ColumnOtps } from "../decorators";
-import { EntityTransformer } from "../entity-transformer";
-import { ColumnMetadata, LilORMType, SQLiteType } from "../types";
+import { ColumnOpts } from "../decorators";
+import { ColumnMetadata, LilORMType } from "../types";
 import { TypesHelper } from "../types-helper";
+import { EntityTransformer } from "../../entity-transformer";
 
 export class MetadataExtractor {
   /**
@@ -117,11 +119,7 @@ export class MetadataExtractor {
       );
       if (columnMetadata) {
         const propertyValue = entityInstance[propertyKey];
-        const columnValue = EntityTransformer.formatValueToPostgreSQLType(
-          propertyValue,
-          columnMetadata.type
-        );
-        values.push(columnValue);
+        values.push(propertyValue);
       }
     }
 
@@ -131,7 +129,27 @@ export class MetadataExtractor {
   static getColumnMetadata(
     target: any,
     propertyKey: string | symbol
-  ): ColumnOtps {
+  ): ColumnOpts {
     return Reflect.getMetadata(COLUMN_METADATA_KEY, target, propertyKey);
+  }
+
+  static processInsert(entity: any) {
+    const constructor = entity.constructor;
+    if (Reflect.hasMetadata(ON_INSERT_METADATA_KEY, constructor)) {
+      const onInsertMetadata: Map<string | symbol, Function> = Reflect.getMetadata(ON_INSERT_METADATA_KEY, constructor);
+      for (const [propertyKey, generateFunction] of onInsertMetadata) {
+        entity[propertyKey] = generateFunction();
+      }
+    }
+  }
+
+  static processUpdate(entity: any) {
+    const constructor = entity.constructor;
+    if (Reflect.hasMetadata(ON_UPDATE_METADATA_KEY, constructor)) {
+      const onUpdateMetadata: Map<string | symbol, Function> = Reflect.getMetadata(ON_UPDATE_METADATA_KEY, constructor);
+      for (const [propertyKey, generateFunction] of onUpdateMetadata) {
+        entity[propertyKey] = generateFunction();
+      }
+    }
   }
 }

@@ -1,23 +1,31 @@
 import {
   COLUMN_METADATA_KEY,
   ENTITY_METADATA_KEY,
+  FOREIGN_KEYS_METADATA_KEY,
+  ON_INSERT_METADATA_KEY,
+  ON_UPDATE_METADATA_KEY,
   PRIMARY_KEY_METADATA_KEY,
 } from "./metadata/constants";
 import { LilORMType } from "./types";
 
 /**
- * @interface ColumnOtps
+ * @interface ColumnOpts
  * @description Options for defining a column in the entity.
  * @property {string} [name] - The name of the column.
  * @property {LilORMType} type - The data type of the column.
  * @property {*} [defaultValue] - The default value for the column.
  * @property {boolean} [notNull] - Indicates if the column is not nullable.
  */
-export interface ColumnOtps {
+export interface ColumnOpts {
   name?: string;
   type: LilORMType;
   defaultValue?: any;
-  notNull?: boolean;
+  nullable?: boolean;
+}
+
+interface ForeignKeyOptions {
+  referencedEntity: () => Function;
+  referencedColumnName: string;
 }
 
 /**
@@ -63,15 +71,43 @@ export function PrimaryKey(opts?: PrimaryKeyOpts): PropertyDecorator {
 /**
  * @function Column
  * @description Decorator function to define a column.
- * @param {ColumnOtps} opts - Options for the column.
+ * @param {ColumnOpts} opts - Options for the column.
  */
-export function Column(opts: ColumnOtps): PropertyDecorator {
+export function Column(opts: ColumnOpts): PropertyDecorator {
   return (target: object, propertyKey: string | symbol) => {
     Reflect.defineMetadata(
       COLUMN_METADATA_KEY,
-      { name: opts?.name, type: opts.type, notNull: opts?.notNull },
+      { name: opts?.name, type: opts.type, notNull: opts?.nullable },
       target,
       propertyKey
     );
+  };
+}
+
+export function OnInsert(generateFunction: () => any): PropertyDecorator {
+  return function (target: any, propertyKey: string | symbol) {
+    if (!Reflect.hasMetadata(ON_INSERT_METADATA_KEY, target.constructor)) {
+      Reflect.defineMetadata(ON_INSERT_METADATA_KEY, new Map(), target.constructor);
+    }
+    const onInsertMetadata = Reflect.getMetadata(ON_INSERT_METADATA_KEY, target.constructor);
+    onInsertMetadata.set(propertyKey, generateFunction);
+  };
+}
+
+export function OnUpdate(generateFunction: () => any): PropertyDecorator {
+  return function (target: any, propertyKey: string | symbol) {
+    if (!Reflect.hasMetadata(ON_UPDATE_METADATA_KEY, target.constructor)) {
+      Reflect.defineMetadata(ON_UPDATE_METADATA_KEY, new Map(), target.constructor);
+    }
+    const onUpdateMetadata = Reflect.getMetadata(ON_UPDATE_METADATA_KEY, target.constructor);
+    onUpdateMetadata.set(propertyKey, generateFunction);
+  };
+}
+
+export function ForeignKey(options: ForeignKeyOptions): PropertyDecorator {
+  return function(target: any, propertyKey: string | symbol) {
+    const existingKeys = Reflect.getMetadata(FOREIGN_KEYS_METADATA_KEY, target.constructor) || [];
+    const newKey = { propertyKey, ...options };
+    Reflect.defineMetadata(FOREIGN_KEYS_METADATA_KEY, [...existingKeys, newKey], target.constructor);
   };
 }

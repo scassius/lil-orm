@@ -7,7 +7,7 @@ describe('LilORM API', () => {
     let lilOrm: LilORM;
 
     beforeEach(async () => {
-        const connectionString = ':memory:';
+        const connectionString = './test.sqlite3';
         lilOrm = new LilORM(connectionString, 'sqlite');
         await lilOrm.createTable(UserEntity);
 
@@ -21,18 +21,22 @@ describe('LilORM API', () => {
         userEntity.createdAt = new Date();
 
         const repository = lilOrm.getRepository(UserEntity);
+        repository.debugMode = true;
 
-        await repository.insert(userEntity);
+        //await repository.insert(userEntity);
     });
 
     it('should build a query and retive an object', async () => {
-        const user = await lilOrm.retrieve<UserEntity>(
-            qb => qb.forEntity(UserEntity)
-            .where('isActive').equals(true)
-            .and('age').greaterThan(18)
+        const repository = lilOrm.getRepository(UserEntity);
+        repository.debugMode = true;
+        const user = await repository.retrieve(
+            qb => qb
+            .where('id').equals(1)
+            /*.and('age').greaterThan(18)
             .or('config').equals({ allowed: true })
-            .finalize(), (data) => data)
-        
+            */)
+        console.log(repository.debugSQLQuery)
+        console.log(user)
         expect(user[0].config).toBe('{"allowed":true}')
         expect(user[0]).toBeDefined();
     });

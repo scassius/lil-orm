@@ -1,6 +1,6 @@
 {
   "name": "lil-orm",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Lil ORM is a super lightweight PostgreSQL ORM for Node.js. With its clear API, you can easily interact with PostgreSQL databases.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -15,11 +15,23 @@
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags"
   },
-  "keywords": [],
+  "keywords": [
+    "orm",
+    "lil-orm",
+    "sqlite",
+    "postgresql",
+    "entity",
+    "ts",
+    "typescript",
+    "js",
+    "javascript",
+    "node"
+  ],
   "author": "Scassius",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.2",
+    "@types/lodash": "^4.14.202",
     "@types/pg": "^8.11.0",
     "jest": "^29.5.0",
     "prettier": "^2.8.8",
@@ -30,8 +42,19 @@
   },
   "dependencies": {
     "date-fns": "^3.3.1",
+    "lodash": "^4.17.21",
+    "reflect-metadata": "^0.1.13"
+  },
+  "optionalDependencies": {
     "pg": "^8.11.3",
-    "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.1.6"
+  },
+  "peerDependenciesMeta": {
+    "pg": {
+      "optional": true
+    },
+    "sqlite3": {
+      "optional": true
+    }
   }
 }

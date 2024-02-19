@@ -1,6 +1,7 @@
 import { Repository } from "./core";
 import { DataAccessLayer } from "./core/data-access-layer/data-access-layer";
 import { DatabaseConnection } from "./core/database/database-connection";
+import { DatabaseConnectionFactory } from "./core/database/database-connection-factory";
 import { MapperAPI } from "./core/mapper-api";
 import { QueryBuilderAPI } from "./core/query-builders/api-query-language";
 import { SchemaGenerator } from "./core/schema-generator/schema-generator";
@@ -25,10 +26,7 @@ export class LilORM {
    * @param {string} databaseString - The connection string or file path of the SQLite database.
    */
   constructor(private readonly databaseString: string, private readonly driver: DBSMType) {
-    this.databaseConnection = new DatabaseConnection(
-      this.databaseString,
-      driver
-    );
+    this.databaseConnection = DatabaseConnectionFactory.createConnection(this.driver, databaseString)
     this.dataAccessLayer = new DataAccessLayer(this.databaseConnection);
     this._schemaGenerator = new SchemaGenerator(this.databaseConnection, driver);
     this.mapper = new MapperAPI();

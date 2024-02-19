@@ -42,12 +42,13 @@ export class SQLiteCreateTableQueryBuilder implements CreateTableQueryBuilder {
       if (propertyMetadata) {
         const columnName = propertyMetadata.name || propertyKey.toString();
         const columnNotNull = !propertyMetadata?.nullable;
-        let columnType = OrmTypesToSQLiteMap[
+        const columnType = OrmTypesToSQLiteMap[
           propertyMetadata.type
         ] as SQLiteType;
 
-        let columnDefinition = `${columnName} ${columnType} ${columnNotNull ? `NOT NULL` : ``
-          }`;
+        let columnDefinition = `${columnName} ${columnType} ${
+          columnNotNull ? `NOT NULL` : ``
+        }`;
 
         if (primaryKeyMetadata) {
           columnDefinition += " PRIMARY KEY";

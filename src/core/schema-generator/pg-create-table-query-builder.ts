@@ -2,7 +2,10 @@ import { ColumnOpts, PrimaryKeyOpts } from "../decorators";
 import { PRIMARY_KEY_METADATA_KEY } from "../metadata/constants";
 import { MetadataExtractor } from "../metadata/metadata-extractor";
 import "reflect-metadata";
-import { OrmTypesToPostgreSQLMap, PostgreSQLType } from "../type-maps/postgres-types";
+import {
+  OrmTypesToPostgreSQLMap,
+  PostgreSQLType,
+} from "../type-maps/postgres-types";
 import { CreateTableQueryBuilder } from "./create-table-query-builder";
 
 export class PgCreateTableQueryBuilder implements CreateTableQueryBuilder {

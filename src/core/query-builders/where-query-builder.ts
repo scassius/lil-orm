@@ -8,8 +8,8 @@ export class WhereQueryBuilder<T> {
   private propertyMappings: PropertyMapping<T>[];
 
   public internal: {
-    entityClass:  new () => T extends object ? T : any
-  }
+    entityClass: new () => T extends object ? T : any;
+  };
 
   constructor(
     entityClass: new () => T extends object ? T : any,
@@ -18,8 +18,8 @@ export class WhereQueryBuilder<T> {
     this.tableName = MetadataExtractor.getEntityTableName(entityClass);
     this.propertyMappings = getPropertyMappings(entityClass);
     this.internal = {
-      entityClass: entityClass
-    }
+      entityClass,
+    };
   }
 
   where<K extends keyof T & string>(propertySelector: K): QueryCondition<T, K> {

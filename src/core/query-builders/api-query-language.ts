@@ -70,11 +70,19 @@ export class QueryBuilderAPI {
         return self;
       },
       setValues(values: any[], types: LilORMType[]): QueryBuilderAPI {
-        self.values = values ? values.map((value, index) => self.sqlBuilderImpl.prepareValue(value, types[index])) : [];
+        self.values = values
+          ? values.map((value, index) =>
+              self.sqlBuilderImpl.prepareValue(value, types[index])
+            )
+          : [];
         return self;
       },
       addValues(values: any[], types: LilORMType[]): QueryBuilderAPI {
-        const preparedValues = values ? values.map((value, index) => self.sqlBuilderImpl.prepareValue(value, types[index])) : [];
+        const preparedValues = values
+          ? values.map((value, index) =>
+              self.sqlBuilderImpl.prepareValue(value, types[index])
+            )
+          : [];
         self.values.push(...preparedValues);
         return self;
       },
@@ -98,7 +106,7 @@ export class QueryBuilderAPI {
       },
       getDBSMImpl(): SQLBuilderImpl {
         return self.sqlBuilderImpl;
-      }
+      },
     };
   }
 
@@ -145,7 +153,7 @@ export class QueryBuilderAPI {
     return this;
   }
 
-  build(): { query: string, values: SQLValue[] } {
+  build(): { query: string; values: SQLValue[] } {
     let values: SQLValue[] = [];
     let fromClause = "";
     const whereClause = this.whereClauses.reduce((acc, clause, i) => {
@@ -177,12 +185,17 @@ export class QueryBuilderAPI {
         fromClause = this.entityQueries[0];
 
         const columnsClause = `(${this.columns.join(", ")})`;
-        const placeholders = this.values.map((_, index) => {
-          const type = getPropertyMappings(this.entityClassWrite).find(
-            (mapping) => mapping.entityProperty === this.columns[index]
-          )?.columnType;
-          return this.sqlBuilderImpl.preparedStatementPlaceholder((index + 1), type as LilORMType);
-        }).join(", ");
+        const placeholders = this.values
+          .map((_, index) => {
+            const type = getPropertyMappings(this.entityClassWrite).find(
+              (mapping) => mapping.entityProperty === this.columns[index]
+            )?.columnType;
+            return this.sqlBuilderImpl.preparedStatementPlaceholder(
+              index + 1,
+              type as LilORMType
+            );
+          })
+          .join(", ");
 
         const valuesClause = `VALUES (${placeholders})`;
         buildStr = `INSERT INTO ${fromClause} ${columnsClause} ${valuesClause}`;
@@ -192,12 +205,17 @@ export class QueryBuilderAPI {
       case OperationType.Update:
         fromClause = this.entityQueries[0];
 
-        const setClause = this.columns.map((clause, index) => {
-          const type = getPropertyMappings(this.entityClassWrite).find(
-            (mapping) => mapping.entityProperty === this.columns[index]
-          )?.columnType;
-          return `${clause} = ${this.sqlBuilderImpl.preparedStatementPlaceholder(index + 1, type as LilORMType)}`
-        }).join(", ");
+        const setClause = this.columns
+          .map((clause, index) => {
+            const type = getPropertyMappings(this.entityClassWrite).find(
+              (mapping) => mapping.entityProperty === this.columns[index]
+            )?.columnType;
+            return `${clause} = ${this.sqlBuilderImpl.preparedStatementPlaceholder(
+              index + 1,
+              type as LilORMType
+            )}`;
+          })
+          .join(", ");
 
         buildStr = `UPDATE ${fromClause} SET ${setClause} ${whereClauseStr}`;
         values = [...this.values];
@@ -210,11 +228,10 @@ export class QueryBuilderAPI {
         break;
 
       default:
-        return { query: whereClauseStr, values: [...this.values]};
-        //throw new Error("Invalid operation type");
+        return { query: whereClauseStr, values: [...this.values] };
     }
-    
+
     this.dispose();
-    return { query: buildStr, values: values };
+    return { query: buildStr, values };
   }
 }

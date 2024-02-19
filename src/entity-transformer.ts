@@ -2,7 +2,6 @@ import { COLUMN_METADATA_KEY } from "./core/metadata/constants";
 import { LilORMType } from "./core/type-maps/lil-orm-types";
 
 export class EntityTransformer {
-
   static sqlEntityToObj<TEntity>(entityInstance: any, values: any): TEntity {
     const properties = Object.keys(entityInstance);
     const entity: any = {};
@@ -34,12 +33,11 @@ export class EntityTransformer {
       case "money":
         return Number(value);
       case "boolean":
-        return value === 'true' || value === 1;
+        return value === "true" || value === 1;
       case "json":
         try {
           return JSON.parse(value);
         } catch (e) {
-          console.error("Error parsing JSON", e);
           return null;
         }
       case "date":

@@ -10,7 +10,6 @@ export type SQLiteType =
   | "DATE"
   | "TIMESTAMP";
 
-
 export const OrmTypesToSQLiteMap: Record<LilORMType, SQLiteType> = {
   integer: "INTEGER",
   text: "TEXT",
@@ -31,6 +30,5 @@ export const OrmTypesToSQLiteMap: Record<LilORMType, SQLiteType> = {
   array: "TEXT",
   binary: "BLOB",
   bit: "INTEGER",
-  money: "NUMERIC"
+  money: "NUMERIC",
 };
-

@@ -4,9 +4,7 @@ import { DatabaseConnection } from "./database-connection";
 export class PostgreSQLProvider implements DatabaseConnection {
   private readonly connection: Pool;
 
-  constructor(
-    connectionString: string
-  ) {
+  constructor(connectionString: string) {
     this.connection = new Pool({
       connectionString,
     });

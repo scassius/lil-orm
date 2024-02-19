@@ -9,9 +9,9 @@ export class DatabaseConnectionFactory {
     connectionString: string
   ): DatabaseConnection {
     switch (type) {
-      case 'postgresql':
+      case "postgresql":
         return new PostgreSQLProvider(connectionString);
-      case 'sqlite':
+      case "sqlite":
         return new SQLiteProvider(connectionString);
       default:
         throw new Error("Unsupported database type");

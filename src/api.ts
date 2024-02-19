@@ -28,12 +28,24 @@ export class LilORM {
    * Creates an instance of LilORM.
    * @param {string} databaseString - The connection string or file path of the SQLite database.
    */
-  constructor(private readonly databaseString: string, private readonly driver: DBSMType) {
-    this.databaseConnection = DatabaseConnectionFactory.createConnection(this.driver, databaseString)
-    this.dataAccessLayer = new DataAccessLayer(this.databaseConnection);
-    this._schemaGenerator = new SchemaGenerator(this.databaseConnection, driver);
+  constructor(
+    private readonly databaseString: string,
+    private readonly driver: DBSMType
+  ) {
+    this.databaseConnection = DatabaseConnectionFactory.createConnection(
+      this.driver,
+      databaseString
+    );
+    this._schemaGenerator = new SchemaGenerator(
+      this.databaseConnection,
+      driver
+    );
     this.mapper = new MapperAPI();
     this.transaction = new Transaction(this.databaseConnection);
+    this.dataAccessLayer = new DataAccessLayer(
+      this.transaction,
+      this.databaseConnection
+    );
   }
 
   async retrieve<TEntity>(
@@ -69,7 +81,12 @@ export class LilORM {
   getRepository<TEntity>(
     entityClass: new () => TEntity extends object ? TEntity : any
   ): Repository<TEntity> {
-    return new Repository<TEntity>(entityClass, this.databaseConnection, this.driver);
+    return new Repository<TEntity>(
+      entityClass,
+      this.databaseConnection,
+      this.driver,
+      this.transaction
+    );
   }
 
   /**

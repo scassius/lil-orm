@@ -10,26 +10,26 @@ import { UpdateQueryBuilder } from "../query-builders/update-query-builder";
 import { QueryCondition } from "../query-builders/query-condition";
 import { DBSMType } from "../type-maps/lil-orm-types";
 import { EntityTransformer } from "../../entity-transformer";
-import _ from 'lodash';
+import _ from "lodash";
+import { Transaction } from "./transaction";
 
 export class Repository<TEntity> {
   private readonly _tableName: string;
   private dataAccessLayer: DataAccessLayer;
-  private queryBuilder: QueryBuilderAPI;
   private debugMode: boolean = false;
 
-  public debugSQLQuery: { query: string, values: any }[] = [];
+  public debugSQLQuery: { query: string; values: any }[] = [];
 
   constructor(
     private readonly entityModel: new () => TEntity extends object
       ? TEntity
       : any,
     private readonly db: DatabaseConnection,
-    private readonly dbsm: DBSMType
+    private readonly dbsm: DBSMType,
+    private readonly transaction: Transaction
   ) {
     this._tableName = MetadataExtractor.getEntityTableName(entityModel);
-    this.dataAccessLayer = new DataAccessLayer(this.db);
-    this.queryBuilder = new QueryBuilderAPI(this.dbsm);
+    this.dataAccessLayer = new DataAccessLayer(this.transaction, this.db);
   }
 
   get dbInstance(): DatabaseConnection {
@@ -49,7 +49,7 @@ export class Repository<TEntity> {
       const queryCopy = _.cloneDeep(queryBuilder);
       queryCopy.forEach((query) => {
         this.debugSQLQuery.push(query.build());
-      })
+      });
     }
   }
 
@@ -66,7 +66,8 @@ export class Repository<TEntity> {
       initialQueryBuilder
     );
 
-    const finalizedQueryBuilder = conditionBuilder(whereQueryBuilder).finalize();
+    const finalizedQueryBuilder =
+      conditionBuilder(whereQueryBuilder).finalize();
 
     this.logDebugQuery([finalizedQueryBuilder]);
 
@@ -79,22 +80,34 @@ export class Repository<TEntity> {
     return results;
   }
 
-  public async insert(entityOrEntities: Partial<TEntity> | Partial<TEntity>[]): Promise<void> {
-    const entities = Array.isArray(entityOrEntities) ? entityOrEntities : [entityOrEntities];
+  public async insert(
+    entityOrEntities: Partial<TEntity> | Partial<TEntity>[],
+    parallel: boolean = false
+  ): Promise<void> {
+    const entities = Array.isArray(entityOrEntities)
+      ? entityOrEntities
+      : [entityOrEntities];
 
     if (entities.length === 0) {
       throw new Error("No entities provided for insertion.");
     }
 
-    let queries: QueryBuilderAPI[] = [];
+    const queries: QueryBuilderAPI[] = [];
 
-    entities.forEach((entityObj, index) => {
-      queries.push(this.queryBuilder.insertInto<TEntity>(this.entityModel).setObject(entityObj).finalize())
+    entities.forEach((entityObj) => {
+      queries.push(
+        _.cloneDeep(
+          new QueryBuilderAPI(this.dbsm)
+            .insertInto<TEntity>(this.entityModel)
+            .setObject(entityObj)
+            .finalize()
+        )
+      );
     });
 
     this.logDebugQuery(queries);
 
-    await this.dataAccessLayer.insert(queries);
+    await this.dataAccessLayer.insert(queries, parallel);
   }
 
   public async update(
@@ -103,7 +116,7 @@ export class Repository<TEntity> {
       whereBuilder: UpdateQueryBuilder<TEntity>
     ) => QueryCondition<TEntity, keyof TEntity>
   ): Promise<void> {
-    const whereBuilder = this.queryBuilder
+    const whereBuilder = new QueryBuilderAPI(this.dbsm)
       .update(this.entityModel)
       .setObject(entityObj);
     const queryBuilder = conditionBuilder(whereBuilder).finalize();
@@ -118,7 +131,7 @@ export class Repository<TEntity> {
       whereBuilder: WhereQueryBuilder<TEntity>
     ) => QueryCondition<TEntity, keyof TEntity>
   ): Promise<void> {
-    const whereBuilder = this.queryBuilder.forEntity(
+    const whereBuilder = new QueryBuilderAPI(this.dbsm).forEntity(
       this.entityModel,
       OperationType.DeleteFrom
     );

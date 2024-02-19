@@ -136,7 +136,8 @@ export class MetadataExtractor {
   static processInsert(entity: any) {
     const constructor = entity.constructor;
     if (Reflect.hasMetadata(ON_INSERT_METADATA_KEY, constructor)) {
-      const onInsertMetadata: Map<string | symbol, Function> = Reflect.getMetadata(ON_INSERT_METADATA_KEY, constructor);
+      const onInsertMetadata: Map<string | symbol, () => any> =
+        Reflect.getMetadata(ON_INSERT_METADATA_KEY, constructor);
       for (const [propertyKey, generateFunction] of onInsertMetadata) {
         entity[propertyKey] = generateFunction();
       }
@@ -146,7 +147,8 @@ export class MetadataExtractor {
   static processUpdate(entity: any) {
     const constructor = entity.constructor;
     if (Reflect.hasMetadata(ON_UPDATE_METADATA_KEY, constructor)) {
-      const onUpdateMetadata: Map<string | symbol, Function> = Reflect.getMetadata(ON_UPDATE_METADATA_KEY, constructor);
+      const onUpdateMetadata: Map<string | symbol, () => any> =
+        Reflect.getMetadata(ON_UPDATE_METADATA_KEY, constructor);
       for (const [propertyKey, generateFunction] of onUpdateMetadata) {
         entity[propertyKey] = generateFunction();
       }

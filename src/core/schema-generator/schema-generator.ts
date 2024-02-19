@@ -7,12 +7,15 @@ import { SQLiteCreateTableQueryBuilder } from "./sqlite-create-table-query-build
 export class SchemaGenerator {
   private readonly createTableQueryBuilder: CreateTableQueryBuilder;
 
-  constructor(private readonly databaseConnection: DatabaseConnection, private readonly driver: DBSMType) {
+  constructor(
+    private readonly databaseConnection: DatabaseConnection,
+    private readonly driver: DBSMType
+  ) {
     switch (driver) {
-      case 'postgresql':
+      case "postgresql":
         this.createTableQueryBuilder = new PgCreateTableQueryBuilder();
         break;
-      case 'sqlite':
+      case "sqlite":
         this.createTableQueryBuilder = new SQLiteCreateTableQueryBuilder();
         break;
     }

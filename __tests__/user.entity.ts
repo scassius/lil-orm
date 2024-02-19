@@ -17,7 +17,8 @@ export class UserEntity {
 
   //@ts-ignore
   @Column({
-    type: "text"
+    type: "text",
+    nullable: true
   })
   name: string;
 
@@ -61,6 +62,13 @@ export class UserEntity {
   @OnInsert(() => new Date())
   @OnUpdate(() => new Date())
   updatedAt: Date;
+
+  //@ts-ignore
+  @Column({
+    type: "timestamp",
+    nullable: true
+  })
+  lastLogin: Date;
 
   //@ts-ignore
   @Column({

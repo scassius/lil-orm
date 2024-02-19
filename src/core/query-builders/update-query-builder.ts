@@ -20,17 +20,21 @@ export class UpdateQueryBuilder<T> {
 
     MetadataExtractor.processUpdate(entityInstance);
 
-    const metadataValues = MetadataExtractor.getEnrichedEntityColumnsMetadata(entityInstance);
+    const metadataValues =
+      MetadataExtractor.getEnrichedEntityColumnsMetadata(entityInstance);
 
     const filteredValues: any[] = [];
     const filteredColumns: any[] = [];
     const filteredTypes: any[] = [];
 
-    for (let i = 0; i < metadataValues.length; i++) {
-      if (metadataValues[i].value !== undefined && !Number.isNaN(metadataValues[i].value)) {
-        filteredValues.push(metadataValues[i].value);
-        filteredColumns.push(metadataValues[i].name);
-        filteredTypes.push(metadataValues[i].type);
+    for (const metadataValue of metadataValues) {
+      if (
+        metadataValue.value !== undefined &&
+        !Number.isNaN(metadataValue.value)
+      ) {
+        filteredValues.push(metadataValue.value);
+        filteredColumns.push(metadataValue.name);
+        filteredTypes.push(metadataValue.type);
       }
     }
 

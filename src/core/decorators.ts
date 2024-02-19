@@ -24,7 +24,7 @@ export interface ColumnOpts {
 }
 
 interface ForeignKeyOptions {
-  referencedEntity: () => Function;
+  referencedEntity: () => new (...args: any[]) => {};
   referencedColumnName: string;
 }
 
@@ -42,7 +42,7 @@ export interface PrimaryKeyOpts {
  * @description Decorator function to define an entity.
  * @param {string} [tableName] - The name of the table associated with the entity.
  */
-export function Entity(tableName?: string): ClassDecorator {
+export const Entity = (tableName?: string): ClassDecorator => {
   return (target: object) => {
     Reflect.defineMetadata(
       ENTITY_METADATA_KEY,
@@ -50,14 +50,14 @@ export function Entity(tableName?: string): ClassDecorator {
       target
     );
   };
-}
+};
 
 /**
  * @function PrimaryKey
  * @description Decorator function to define a primary key.
  * @param {PrimaryKeyOpts} [opts] - Options for the primary key.
  */
-export function PrimaryKey(opts?: PrimaryKeyOpts): PropertyDecorator {
+export const PrimaryKey = (opts?: PrimaryKeyOpts): PropertyDecorator => {
   return (target: object, propertyKey: string | symbol) => {
     Reflect.defineMetadata(
       PRIMARY_KEY_METADATA_KEY,
@@ -66,14 +66,14 @@ export function PrimaryKey(opts?: PrimaryKeyOpts): PropertyDecorator {
       propertyKey
     );
   };
-}
+};
 
 /**
  * @function Column
  * @description Decorator function to define a column.
  * @param {ColumnOpts} opts - Options for the column.
  */
-export function Column(opts: ColumnOpts): PropertyDecorator {
+export const Column = (opts: ColumnOpts): PropertyDecorator => {
   return (target: object, propertyKey: string | symbol) => {
     Reflect.defineMetadata(
       COLUMN_METADATA_KEY,
@@ -82,32 +82,50 @@ export function Column(opts: ColumnOpts): PropertyDecorator {
       propertyKey
     );
   };
-}
+};
 
-export function OnInsert(generateFunction: () => any): PropertyDecorator {
-  return function (target: any, propertyKey: string | symbol) {
+export const OnInsert = (generateFunction: () => any): PropertyDecorator => {
+  return (target: any, propertyKey: string | symbol) => {
     if (!Reflect.hasMetadata(ON_INSERT_METADATA_KEY, target.constructor)) {
-      Reflect.defineMetadata(ON_INSERT_METADATA_KEY, new Map(), target.constructor);
+      Reflect.defineMetadata(
+        ON_INSERT_METADATA_KEY,
+        new Map(),
+        target.constructor
+      );
     }
-    const onInsertMetadata = Reflect.getMetadata(ON_INSERT_METADATA_KEY, target.constructor);
+    const onInsertMetadata = Reflect.getMetadata(
+      ON_INSERT_METADATA_KEY,
+      target.constructor
+    );
     onInsertMetadata.set(propertyKey, generateFunction);
   };
-}
+};
 
-export function OnUpdate(generateFunction: () => any): PropertyDecorator {
-  return function (target: any, propertyKey: string | symbol) {
+export const OnUpdate = (generateFunction: () => any): PropertyDecorator => {
+  return (target: any, propertyKey: string | symbol) => {
     if (!Reflect.hasMetadata(ON_UPDATE_METADATA_KEY, target.constructor)) {
-      Reflect.defineMetadata(ON_UPDATE_METADATA_KEY, new Map(), target.constructor);
+      Reflect.defineMetadata(
+        ON_UPDATE_METADATA_KEY,
+        new Map(),
+        target.constructor
+      );
     }
-    const onUpdateMetadata = Reflect.getMetadata(ON_UPDATE_METADATA_KEY, target.constructor);
+    const onUpdateMetadata = Reflect.getMetadata(
+      ON_UPDATE_METADATA_KEY,
+      target.constructor
+    );
     onUpdateMetadata.set(propertyKey, generateFunction);
   };
-}
+};
 
-export function ForeignKey(options: ForeignKeyOptions): PropertyDecorator {
-  return function(target: any, propertyKey: string | symbol) {
+export const ForeignKey = (options: ForeignKeyOptions): PropertyDecorator => {
+  return (target: any, propertyKey: string | symbol) => {
     const existingKeys = Reflect.getMetadata(FOREIGN_KEYS_METADATA_KEY, target.constructor) || [];
     const newKey = { propertyKey, ...options };
-    Reflect.defineMetadata(FOREIGN_KEYS_METADATA_KEY, [...existingKeys, newKey], target.constructor);
+    Reflect.defineMetadata(
+      FOREIGN_KEYS_METADATA_KEY,
+      [...existingKeys, newKey],
+      target.constructor
+    );
   };
-}
+};

@@ -1,7 +1,7 @@
 ![ORM](https://github.com/scassius/lil-orm/assets/35706430/5fd46412-ea3d-40b8-a56a-20450e9e2986)
 
 # Lil ORM
-Lil ORM is a lightweight PostgreSQL ORM designed for Node.js. This compact project prioritizes clarity and simplicity in its API, making it effortless to interact with PostgreSQL databases. Although it's a lightweight ORM, it boasts a robust set of capabilities, letting developers create intricate database queries with ease.
+Lil ORM is a lightweight ORM designed for Node.js. This compact project prioritizes clarity and simplicity in its API, making it effortless to interact with SQL databases. Although it's a lightweight ORM, it boasts a robust set of capabilities, letting developers create intricate database queries with ease.
 
 While Lil ORM is primarily intended as a learning resource and experimental project, its lean design and user-friendly approach make it a noteworthy tool for those looking to understand the nuances of building APIs without the complexity that often accompanies larger ORMs.
 
@@ -21,9 +21,12 @@ Please note: Lil ORM is currently not recommended for use in production environm
 - **JSON Query Support**: New capabilities for querying JSON fields with functions like `jsonEquals` and `jsonContains`.
 - **Expanded Type Support**: Increased range of supported data types.
 - **Lifecycle Hooks**: Added `OnInsert` and `OnUpdate` hooks for custom logic during data operations.
+- **Query Grouping**: Support for complex query constructions with parenthetical grouping, allowing for advanced logical combinations.
+- **Transaction Support**: Enhanced support for transactional operations, ensuring data integrity across multiple operations.
+- **Bulk Insert**: Added capability for bulk inserting data, improving efficiency for large data operations.
 
 ### Changes
-- **API Overhaul**: Many APIs have been changed or updated to improve usability and efficiency. Check the documentation for migration guides.
+- **API Overhaul**: Many APIs have been changed or updated to improve usability and efficiency.
 
 ## Version 2.0.0
 

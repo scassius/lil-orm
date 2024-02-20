@@ -244,6 +244,7 @@ To assist in debugging and optimizing your SQL queries, you can enable a debug m
 ```typescript
 const repository = lilOrm.getRepository(UserEntity);
 repository.enableDebugMode();
+console.log(repository.debugSQLQuery);
 ```
 
 ### Note

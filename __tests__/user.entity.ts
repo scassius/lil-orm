@@ -13,7 +13,7 @@ export class UserEntity {
     type: "integer",
     name: "id",
   })
-  id: number;
+  id: number | null;
 
   //@ts-ignore
   @Column({
@@ -28,7 +28,7 @@ export class UserEntity {
     name: "email",
     nullable: true,
   })
-  email: string;
+  email: string | null;
 
   //@ts-ignore
   @Column({

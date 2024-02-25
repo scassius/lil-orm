@@ -13,14 +13,14 @@ export class Transaction {
    */
   begin(): void {
     this.statements = [];
-    this.db.dbInstance.exec("BEGIN");
+    this.db.executeNonQuery("BEGIN", []);
   }
 
   /**
    * Commits the transaction.
    */
   commit(): void {
-    this.db.dbInstance.exec("COMMIT");
+    this.db.executeNonQuery("COMMIT", []);
   }
 
   /**
@@ -35,7 +35,7 @@ export class Transaction {
    * Rolls back the transaction.
    */
   rollback(): void {
-    this.db.dbInstance.exec("ROLLBACK");
+    this.db.executeNonQuery("ROLLBACK", []);
   }
 
   /**

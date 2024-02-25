@@ -25,9 +25,8 @@ export class QueryCondition<T, K extends keyof T> {
     const mapping = this.propertyMappings.find(
       (mappingItem) => mappingItem.entityProperty === this.property
     );
-    return `${this.tableName}.${
-      mapping ? mapping.columnName : String(this.property)
-    }`;
+    return `${this.tableName}.${mapping ? mapping.columnName : String(this.property)
+      }`;
   }
 
   jsonContains<P extends keyof T[K]>(
@@ -93,17 +92,21 @@ export class QueryCondition<T, K extends keyof T> {
 
   is(value: T[K]): QueryCondition<T, K> {
     const columnName = this.getColumnName();
-    this.whereClauses.push(
-      `${columnName} IS ${this.enqueueValueForQuery(value)}`
-    );
+    if (value === null) {
+      this.whereClauses.push(`${columnName} IS NULL`);
+    } else {
+      this.whereClauses.push(`${columnName} = ${this.enqueueValueForQuery(value)}`);
+    }
     return this;
   }
 
   isNot(value: T[K]): QueryCondition<T, K> {
     const columnName = this.getColumnName();
-    this.whereClauses.push(
-      `${columnName} IS NOT ${this.enqueueValueForQuery(value)}`
-    );
+    if (value === null) {
+      this.whereClauses.push(`${columnName} IS NOT NULL`);
+    } else {
+      this.whereClauses.push(`${columnName} != ${this.enqueueValueForQuery(value)}`);
+    }
     return this;
   }
 
@@ -228,7 +231,8 @@ export class QueryCondition<T, K extends keyof T> {
       .getDBSMImpl()
       .preparedStatementPlaceholder(
         queryBuilder.getValues().length,
-        type as LilORMType
+        type as LilORMType,
+        value
       );
     return placeholder;
   }

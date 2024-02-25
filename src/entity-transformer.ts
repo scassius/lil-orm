@@ -6,6 +6,11 @@ export class EntityTransformer {
     const properties = Object.keys(entityInstance);
     const entity: any = {};
 
+    const lowerCaseValues = Object.keys(values).reduce((acc: any, currentKey) => {
+      acc[currentKey.toLowerCase()] = values[currentKey];
+      return acc;
+    }, {});
+
     for (const propertyKey of properties) {
       const columnMetadata = Reflect.getMetadata(
         COLUMN_METADATA_KEY,
@@ -13,9 +18,9 @@ export class EntityTransformer {
         propertyKey
       );
       if (columnMetadata) {
-        const columnName = columnMetadata.name || propertyKey.toString();
+        const columnName = (columnMetadata.name || propertyKey.toString()).toLowerCase();
         entity[propertyKey] = EntityTransformer.formatValue(
-          values[columnName],
+          lowerCaseValues[columnName],
           columnMetadata.type
         );
       }
@@ -25,20 +30,28 @@ export class EntityTransformer {
   }
 
   static formatValue(value: any, type: LilORMType): any {
+    if (value == null) {
+      return null;
+    }
+
     switch (type) {
       case "integer":
       case "decimal":
       case "float":
       case "double":
-      case "money":
         return Number(value);
+      case "money":
+        if (typeof value === "number") {
+          return value;
+        }
+        return parseFloat((value as string).replace(/[^0-9.-]+/g, ''));;
       case "boolean":
-        return value === "true" || value === 1;
+        return value === "true" || value === "t" || value === 1 || value === "1" || value === true;
       case "json":
         try {
           return JSON.parse(value);
         } catch (e) {
-          return null;
+          return value;
         }
       case "date":
       case "timestamp":

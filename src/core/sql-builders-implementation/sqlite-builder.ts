@@ -29,7 +29,7 @@ export class SQLiteBuilder extends SQLBuilderImpl {
       case "text":
       case "enum":
       case "array":
-        return value.toString();
+        return value?.toString();
       case "binary":
         return value;
       case "integer":

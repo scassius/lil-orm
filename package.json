@@ -1,6 +1,6 @@
 {
   "name": "lil-orm",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Lil ORM is a lightweight and flexible ORM for Node.js, designed with a clear and intuitive API to simplify database operations. Engineered for adaptability, it enables efficient interaction with databases.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",

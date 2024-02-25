@@ -186,13 +186,14 @@ export class QueryBuilderAPI {
 
         const columnsClause = `(${this.columns.join(", ")})`;
         const placeholders = this.values
-          .map((_, index) => {
+          .map((value, index) => {
             const type = getPropertyMappings(this.entityClassWrite).find(
-              (mapping) => mapping.entityProperty === this.columns[index]
+              (mapping) => mapping.columnName === this.columns[index]
             )?.columnType;
             return this.sqlBuilderImpl.preparedStatementPlaceholder(
               index + 1,
-              type as LilORMType
+              type as LilORMType,
+              value
             );
           })
           .join(", ");
@@ -208,11 +209,12 @@ export class QueryBuilderAPI {
         const setClause = this.columns
           .map((clause, index) => {
             const type = getPropertyMappings(this.entityClassWrite).find(
-              (mapping) => mapping.entityProperty === this.columns[index]
+              (mapping) => mapping.columnName === this.columns[index]
             )?.columnType;
             return `${clause} = ${this.sqlBuilderImpl.preparedStatementPlaceholder(
               index + 1,
-              type as LilORMType
+              type as LilORMType,
+              this.values[index]
             )}`;
           })
           .join(", ");

@@ -1,11 +1,14 @@
 import { LilORM } from "../src/api";
+import { DBSMType } from "../src/core/type-maps/lil-orm-types";
 import { UserEntity } from "./user.entity";
 
 describe('LilORM API', () => {
     let lilOrm: LilORM;
+    const dbsmType: DBSMType = 'sqlite';
 
     beforeEach(async () => {
-        lilOrm = new LilORM(':memory:', 'sqlite');
+        lilOrm = new LilORM(':memory:', dbsmType);
+
         await lilOrm.createTable(UserEntity);
 
         const user = new UserEntity();
@@ -21,6 +24,12 @@ describe('LilORM API', () => {
         await repository.insert(user);
     });
 
+    afterEach(async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        await repository.delete(qb => qb.where('id').isNot(null));
+        lilOrm.dbInstance.releaseConnection();
+    });
+
     it('inserts and retrieves a UserEntity', async () => {
         const user = new UserEntity();
         user.id = 12;
@@ -29,14 +38,30 @@ describe('LilORM API', () => {
         user.isActive = true;
         user.permission = 42;
         user.income = 50000.69;
+        user.lastLogin = new Date();
         user.config = { allowed: true };
 
         const repository = lilOrm.getRepository(UserEntity);
+        repository.enableDebugMode()
 
-        await repository.insert(user);
+        await repository.insert(user, true);
 
         const retrievedUser = await repository.retrieve(qb => qb.where('id').equals(12));
-        expect(retrievedUser[0].name).toBe('John Doe');
+
+        expect(retrievedUser[0].id).toBe(user.id);
+        expect(retrievedUser[0].name).toBe(user.name);
+        expect(retrievedUser[0].email).toBe(user.email);
+        expect(retrievedUser[0].isActive).toBe(user.isActive);
+        expect(retrievedUser[0].permission).toBe(user.permission);
+        expect(retrievedUser[0].income).toBe(user.income);
+        expect(retrievedUser[0].config).toEqual(user.config);
+
+        expect(retrievedUser[0].lastLogin.getFullYear()).toBe(user.lastLogin.getFullYear());
+        expect(retrievedUser[0].lastLogin.getMonth()).toBe(user.lastLogin.getMonth());
+        expect(retrievedUser[0].lastLogin.getDate()).toBe(user.lastLogin.getDate());
+        expect(retrievedUser[0].lastLogin.getHours()).toBe(user.lastLogin.getHours());
+        expect(retrievedUser[0].lastLogin.getMinutes()).toBe(user.lastLogin.getMinutes());
+        expect(retrievedUser[0].lastLogin.getSeconds()).toBe(user.lastLogin.getSeconds());
     });
 
     it('updates a UserEntity', async () => {
@@ -94,7 +119,7 @@ describe('LilORM API', () => {
         });
 
         const users = await repository.retrieve(
-            qb => qb.where('config').jsonContains('details.level', 42)
+            qb => (dbsmType as string) === 'sqlite' ? qb.where('config').jsonContains('details.level', 42) : qb.where('config').jsonContains('details', { level: 42 })
         );
 
         expect(users[0].config.details.level).toBe(42);
@@ -155,6 +180,7 @@ describe('LilORM API', () => {
 
     it('conditionally updates UserEntity based on email', async () => {
         const repository = lilOrm.getRepository(UserEntity);
+        repository.enableDebugMode()
         await repository.update({ isActive: true }, qb => qb.where('email').equals('john@example.com'));
         const updatedUser = await repository.retrieve(qb => qb.where('id').equals(1));
         expect(updatedUser[0].isActive).toBe(true);
@@ -174,7 +200,7 @@ describe('LilORM API', () => {
         const repository = lilOrm.getRepository(UserEntity);
         repository.enableDebugMode()
         await repository.insert({ id: 14, permission: 5 });
-        
+
         await repository.delete(qb => qb.where('permission').compare('<', 10));
 
         const users = await repository.retrieve(qb => qb.where('id').equals(14));
@@ -206,7 +232,7 @@ describe('LilORM API', () => {
     it('retrieves UserEntity with complex JSON query', async () => {
         const repository = lilOrm.getRepository(UserEntity);
         await repository.insert({ id: 17, config: { deep: { nested: true } } });
-        const users = await repository.retrieve(qb => qb.where('config').jsonContains('deep.nested', true));
+        const users = await repository.retrieve(qb => qb.where('config').jsonContains('deep', { nested: true }));
         expect(users.length).toBeGreaterThan(0);
         expect(users[0].id).toBe(17);
     });
@@ -228,7 +254,7 @@ describe('LilORM API', () => {
         const users = await repository.retrieve(qb => qb.where('id').compare('>=', 18));
         expect(users.length).toBe(2);
     });
-    
+
     it('filters UserEntities by a specific last login date', async () => {
         const repository = lilOrm.getRepository(UserEntity);
         await repository.insert({ id: 27, name: 'Last Login Filter Test', lastLogin: new Date(2021, 0, 15) });
@@ -299,11 +325,141 @@ describe('LilORM API', () => {
         user.id = 34;
         user.name = maliciousString;
         user.email = 'test@example.com';
-        
+
         await repository.insert(user);
-    
+
         const retrievedUser = await repository.retrieve(qb => qb.where('name').equals(maliciousString));
         expect(retrievedUser.length).toBe(1);
         expect(retrievedUser[0].name).toBe(maliciousString);
+    });
+
+    it('finds entities with a specific field set to null', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        await repository.insert({ id: 2, name: 'Test User 1', email: null });
+
+        const users = await repository.retrieve(qb => qb.where('email').is(null));
+        expect(users).toHaveLength(1);
+        expect(users[0].name).toBe('Test User 1');
+    });
+
+    it('finds entities with a specific field not set to null', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        await repository.insert({ id: 2, name: 'Test User 2', email: 'user2@example.com' });
+
+        const users = await repository.retrieve(qb => qb.where('email').isNot(null));
+        expect(users.some(user => user.id === 2)).toBe(true);
+    });
+
+
+    it('updates a field to be null', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        await repository.insert({ id: 3, name: 'Test User 3', email: 'user3@example.com' });
+
+        await repository.update({ email: null }, qb => qb.where('id').equals(3));
+        const updatedUser = await repository.retrieve(qb => qb.where('id').equals(3));
+
+        expect(updatedUser[0].email).toBeNull();
+    });
+
+    it('inserts entities with both null and non-null fields', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        await repository.insert([
+            { id: 4, name: 'Test User 4', email: null },
+            { id: 5, name: 'Test User 5', email: 'user5@example.com' }
+        ]);
+
+        const users = await repository.retrieve(qb => qb.where('id').compare('>=', 4));
+        expect(users).toHaveLength(2);
+        expect((users.find(user => user.id === 4) as any).email).toBeNull();
+        expect((users.find(user => user.id === 5) as any).email).not.toBeNull();
+    });
+
+    it('retrieves entities by comparing a field against null and non-null values', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        await repository.insert({ id: 6, name: 'Test User 6', email: null });
+        await repository.insert({ id: 7, name: 'Test User 7', email: 'user7@example.com' });
+
+        const nullEmailUsers = await repository.retrieve(qb => qb.where('email').is(null));
+        const nonNullEmailUsers = await repository.retrieve(qb => qb.where('email').isNot(null));
+
+        expect(nullEmailUsers.some(user => user.id === 6)).toBe(true);
+        expect(nonNullEmailUsers.some(user => user.id === 7)).toBe(true);
+    });
+
+    it('correctly stores and retrieves UTC dates', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        const utcDate = new Date('2024-01-01T12:00:00Z');
+
+        await repository.insert({ id: 2, name: 'UTC Test', lastLogin: utcDate });
+        const retrievedUser = await repository.retrieve(qb => qb.where('id').equals(2));
+
+        expect(new Date(retrievedUser[0].lastLogin).toISOString()).toBe(utcDate.toISOString());
+    });
+
+    it('handles dates from different timezones correctly', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        const nyDate = new Date('2024-01-01T07:00:00-05:00');
+
+        await repository.insert({ id: 2, name: 'Timezone Test', lastLogin: nyDate });
+        const retrievedUser = await repository.retrieve(qb => qb.where('id').equals(2));
+
+        expect(new Date(retrievedUser[0].lastLogin).toISOString()).toBe(nyDate.toISOString());
+    });
+
+    it('performs timezone-sensitive query operations correctly', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        const beforeDate = new Date('2024-01-01T11:00:00Z');
+        const afterDate = new Date('2024-01-01T13:00:00Z');
+
+        await repository.insert({ id: 3, name: 'Query Timezone Test', lastLogin: new Date('2024-01-01T12:00:00Z') });
+        const users = await repository.retrieve(qb => qb.where('lastLogin').compare('>', beforeDate).and('lastLogin').compare('<', afterDate));
+
+        expect(users.length).toBe(1);
+        expect(users[0].id).toBe(3);
+    });
+
+
+    it('retrieves entities within a specific numeric range', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        await repository.insert([
+            { id: 101, name: 'Range Test 1', permission: 10 },
+            { id: 102, name: 'Range Test 2', permission: 20 },
+            { id: 103, name: 'Range Test 3', permission: 30 }
+        ]);
+
+        const users = await repository.retrieve(
+            qb => qb.where('permission').compare('>=', 15).and('permission').compare('<=', 25)
+        );
+
+        expect(users.length).toBe(1);
+        expect(users[0].name).toBe('Range Test 2');
+    });
+
+    it('conditionally updates entities based on specific criteria', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        await repository.insert([
+            { id: 104, name: 'Update Test 1', isActive: false },
+            { id: 105, name: 'Update Test 2', isActive: false }
+        ]);
+
+        await repository.update({ isActive: true }, qb => qb.where('id').equals(104));
+
+        const updatedUser = await repository.retrieve(qb => qb.where('id').equals(104));
+        const nonUpdatedUser = await repository.retrieve(qb => qb.where('id').equals(105));
+
+        expect(updatedUser[0].isActive).toBe(true);
+        expect(nonUpdatedUser[0].isActive).toBe(false);
+    });
+
+    it('retrieves entities by substring search', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        await repository.insert({ id: 106, name: 'Substring Search', email: 'substring@example.com' });
+
+        const users = await repository.retrieve(
+            qb => qb.where('email').like('%sub%')
+        );
+
+        expect(users.length).toBeGreaterThan(0);
+        expect(users[0].email).toContain('substring');
     });
 });

@@ -4,9 +4,13 @@ import {
   PostgreSQLType,
 } from "../type-maps/postgres-types";
 import { SQLBuilderImpl } from "./sql-builder-implementation";
+import { formatISO, parseISO } from "date-fns";
 
 export class PostgreSQLBuilder extends SQLBuilderImpl {
-  preparedStatementPlaceholder(index: number, type: LilORMType): string {
+  preparedStatementPlaceholder(index: number, type: LilORMType, value: any): string {
+    if (value == null) {
+      return `$${index}`;
+    }
     return `$${index}::${this.valueCasting(type)}`;
   }
 
@@ -23,7 +27,7 @@ export class PostgreSQLBuilder extends SQLBuilderImpl {
   }
 
   jsonContains(columnName: string, path: string, value: string): string {
-    return `${columnName} @> '{"${path}": ${value}}'`;
+    return `${columnName} @> jsonb_build_object('${path}', ${value})`;
   }
 
   prepareValue(value: any, type: LilORMType): any {
@@ -33,14 +37,15 @@ export class PostgreSQLBuilder extends SQLBuilderImpl {
       case "json":
         return JSON.stringify(value);
       case "date":
-        return value instanceof Date ? value.toISOString() : value;
+      case "timestamp":
+        return formatISO(new Date(value));
       case "uuid":
       case "varchar":
       case "char":
       case "text":
       case "enum":
       case "time":
-        return value.toString();
+        return value?.toString();
       case "array":
         return `{${value.join(",")}}`;
       case "binary":

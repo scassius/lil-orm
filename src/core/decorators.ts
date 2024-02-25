@@ -120,7 +120,8 @@ export const OnUpdate = (generateFunction: () => any): PropertyDecorator => {
 
 export const ForeignKey = (options: ForeignKeyOptions): PropertyDecorator => {
   return (target: any, propertyKey: string | symbol) => {
-    const existingKeys = Reflect.getMetadata(FOREIGN_KEYS_METADATA_KEY, target.constructor) || [];
+    const existingKeys =
+      Reflect.getMetadata(FOREIGN_KEYS_METADATA_KEY, target.constructor) || [];
     const newKey = { propertyKey, ...options };
     Reflect.defineMetadata(
       FOREIGN_KEYS_METADATA_KEY,

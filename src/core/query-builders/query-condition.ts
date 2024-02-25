@@ -25,8 +25,9 @@ export class QueryCondition<T, K extends keyof T> {
     const mapping = this.propertyMappings.find(
       (mappingItem) => mappingItem.entityProperty === this.property
     );
-    return `${this.tableName}.${mapping ? mapping.columnName : String(this.property)
-      }`;
+    return `${this.tableName}.${
+      mapping ? mapping.columnName : String(this.property)
+    }`;
   }
 
   jsonContains<P extends keyof T[K]>(
@@ -95,7 +96,9 @@ export class QueryCondition<T, K extends keyof T> {
     if (value === null) {
       this.whereClauses.push(`${columnName} IS NULL`);
     } else {
-      this.whereClauses.push(`${columnName} = ${this.enqueueValueForQuery(value)}`);
+      this.whereClauses.push(
+        `${columnName} = ${this.enqueueValueForQuery(value)}`
+      );
     }
     return this;
   }
@@ -105,7 +108,9 @@ export class QueryCondition<T, K extends keyof T> {
     if (value === null) {
       this.whereClauses.push(`${columnName} IS NOT NULL`);
     } else {
-      this.whereClauses.push(`${columnName} != ${this.enqueueValueForQuery(value)}`);
+      this.whereClauses.push(
+        `${columnName} != ${this.enqueueValueForQuery(value)}`
+      );
     }
     return this;
   }

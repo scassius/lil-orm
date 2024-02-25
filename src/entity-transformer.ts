@@ -6,10 +6,13 @@ export class EntityTransformer {
     const properties = Object.keys(entityInstance);
     const entity: any = {};
 
-    const lowerCaseValues = Object.keys(values).reduce((acc: any, currentKey) => {
-      acc[currentKey.toLowerCase()] = values[currentKey];
-      return acc;
-    }, {});
+    const lowerCaseValues = Object.keys(values).reduce(
+      (acc: any, currentKey) => {
+        acc[currentKey.toLowerCase()] = values[currentKey];
+        return acc;
+      },
+      {}
+    );
 
     for (const propertyKey of properties) {
       const columnMetadata = Reflect.getMetadata(
@@ -18,7 +21,9 @@ export class EntityTransformer {
         propertyKey
       );
       if (columnMetadata) {
-        const columnName = (columnMetadata.name || propertyKey.toString()).toLowerCase();
+        const columnName = (
+          columnMetadata.name || propertyKey.toString()
+        ).toLowerCase();
         entity[propertyKey] = EntityTransformer.formatValue(
           lowerCaseValues[columnName],
           columnMetadata.type
@@ -44,9 +49,15 @@ export class EntityTransformer {
         if (typeof value === "number") {
           return value;
         }
-        return parseFloat((value as string).replace(/[^0-9.-]+/g, ''));;
+        return parseFloat((value as string).replace(/[^0-9.-]+/g, ""));
       case "boolean":
-        return value === "true" || value === "t" || value === 1 || value === "1" || value === true;
+        return (
+          value === "true" ||
+          value === "t" ||
+          value === 1 ||
+          value === "1" ||
+          value === true
+        );
       case "json":
         try {
           return JSON.parse(value);

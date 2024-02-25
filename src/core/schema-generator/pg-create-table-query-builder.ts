@@ -57,10 +57,12 @@ export class PgCreateTableQueryBuilder implements CreateTableQueryBuilder {
         }
 
         if (primaryKeyOptions.autoIncrement) {
-          if (columnType === 'integer') {
+          if (columnType === "integer") {
             columnDefinition = `${columnName} SERIAL PRIMARY KEY`;
           } else {
-            throw new Error('autoIncrement is supported only for columns of type integer.');
+            throw new Error(
+              "autoIncrement is supported only for columns of type integer."
+            );
           }
         } else if (primaryKeyMetadata) {
           columnDefinition += ` PRIMARY KEY`;

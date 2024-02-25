@@ -7,7 +7,11 @@ import { SQLBuilderImpl } from "./sql-builder-implementation";
 import { formatISO, parseISO } from "date-fns";
 
 export class PostgreSQLBuilder extends SQLBuilderImpl {
-  preparedStatementPlaceholder(index: number, type: LilORMType, value: any): string {
+  preparedStatementPlaceholder(
+    index: number,
+    type: LilORMType,
+    value: any
+  ): string {
     if (value == null) {
       return `$${index}`;
     }

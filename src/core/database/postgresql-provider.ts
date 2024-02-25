@@ -30,7 +30,10 @@ export class PostgreSQLProvider implements DatabaseConnection {
     }
   }
 
-  public async executeNonQuery(query: string, values: any[] = []): Promise<void> {
+  public async executeNonQuery(
+    query: string,
+    values: any[] = []
+  ): Promise<void> {
     const client = await this.getClient();
     try {
       await client.query(query, values);

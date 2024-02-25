@@ -41,5 +41,7 @@ export class SQLiteProvider implements DatabaseConnection {
     });
   }
 
-  async releaseConnection() {}
+  async releaseConnection() {
+    return;
+  }
 }

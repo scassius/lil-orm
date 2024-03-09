@@ -7,7 +7,8 @@ describe('LilORM API', () => {
     const dbsmType: DBSMType = 'sqlite';
 
     beforeEach(async () => {
-        lilOrm = new LilORM(':memory:', dbsmType);
+        const connectionString = `:memory:`
+        lilOrm = new LilORM(connectionString, dbsmType);
 
         await lilOrm.createTable(UserEntity);
 
@@ -247,12 +248,31 @@ describe('LilORM API', () => {
 
     it('performs bulk insert and retrieves multiple UserEntities', async () => {
         const repository = lilOrm.getRepository(UserEntity);
+        repository.enableDebugMode();
         await repository.insert([
             { id: 18, name: 'Bulk Insert 1' },
             { id: 19, name: 'Bulk Insert 2' }
-        ], true);
+        ]);
+
         const users = await repository.retrieve(qb => qb.where('id').compare('>=', 18));
         expect(users.length).toBe(2);
+    });
+
+    it('inserts and retrieves multiple users with different properties', async () => {
+        const repository = lilOrm.getRepository(UserEntity);
+        const usersToInsert = [
+            { id: 18, name: 'User 1', email: 'email1@example.com', config: { key: 'value' }, isActive: true },
+            { id: 19, name: 'User 2', config: { key: 'value' }, isActive: false },
+            { id: 20, name: 'User 3', email: 'email3@example.com', permission: 1 },
+            { id: 21, name: 'User 4', lastLogin: new Date(), income: 500 },
+            { id: 22, name: 'User 5', email: 'email5@example.com', isActive: true, permission: 3, income: 1000 },
+        ];
+
+        await repository.insert(usersToInsert);
+
+        const users = await repository.retrieve(qb => qb.where('id').compare('>=', 18));
+        
+        expect(users.length).toBe(5);
     });
 
     it('filters UserEntities by a specific last login date', async () => {

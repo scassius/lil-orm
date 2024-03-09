@@ -24,7 +24,7 @@ export class UpdateQueryBuilder<T> {
       MetadataExtractor.getEnrichedEntityColumnsMetadata(entityInstance);
 
     const filteredValues: any[] = [];
-    const filteredColumns: any[] = [];
+    const filteredColumns: string[] = [];
     const filteredTypes: any[] = [];
 
     for (const metadataValue of metadataValues) {
@@ -33,7 +33,7 @@ export class UpdateQueryBuilder<T> {
         !Number.isNaN(metadataValue.value)
       ) {
         filteredValues.push(metadataValue.value);
-        filteredColumns.push(metadataValue.name);
+        filteredColumns.push(`"${metadataValue.name}"`);
         filteredTypes.push(metadataValue.type);
       }
     }

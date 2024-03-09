@@ -50,7 +50,7 @@ export class PgCreateTableQueryBuilder implements CreateTableQueryBuilder {
         ] as PostgreSQLType;
         const primaryKeyOptions = primaryKeyMetadata || {};
 
-        let columnDefinition = `${columnName} ${columnType}`;
+        let columnDefinition = `"${columnName}" ${columnType}`;
 
         if (columnNotNull && !primaryKeyOptions.autoIncrement) {
           columnDefinition += ` NOT NULL`;
@@ -58,7 +58,7 @@ export class PgCreateTableQueryBuilder implements CreateTableQueryBuilder {
 
         if (primaryKeyOptions.autoIncrement) {
           if (columnType === "integer") {
-            columnDefinition = `${columnName} SERIAL PRIMARY KEY`;
+            columnDefinition = `"${columnName}" SERIAL PRIMARY KEY`;
           } else {
             throw new Error(
               "autoIncrement is supported only for columns of type integer."

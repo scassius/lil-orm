@@ -46,7 +46,7 @@ export class SQLiteCreateTableQueryBuilder implements CreateTableQueryBuilder {
           propertyMetadata.type
         ] as SQLiteType;
 
-        let columnDefinition = `${columnName} ${columnType} ${
+        let columnDefinition = `"${columnName}" ${columnType} ${
           columnNotNull ? `NOT NULL` : ``
         }`;
 

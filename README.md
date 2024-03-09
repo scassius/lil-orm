@@ -11,6 +11,14 @@ Please note: Lil ORM is currently not recommended for use in production environm
 
 # Changelog
 
+## Version 3.1.0
+
+### Performance Improvements
+- **Bulk Insert Optimization**: Enhanced the performance of bulk insert operations, significantly reducing the time required for inserting large volumes of data.
+
+### Bug Fixes
+- **PostgreSQL Column Name Case Sensitivity**: Fixed an issue where column names were forced into lowercase, leading to errors in environments where case sensitivity is important. Now, column names are handled in a case-sensitive manner, aligning with PostgreSQL standards.
+
 ## Version 3.0.0
 
 ### Security Enhancements

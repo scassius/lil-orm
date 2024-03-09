@@ -6,14 +6,6 @@ export class EntityTransformer {
     const properties = Object.keys(entityInstance);
     const entity: any = {};
 
-    const lowerCaseValues = Object.keys(values).reduce(
-      (acc: any, currentKey) => {
-        acc[currentKey.toLowerCase()] = values[currentKey];
-        return acc;
-      },
-      {}
-    );
-
     for (const propertyKey of properties) {
       const columnMetadata = Reflect.getMetadata(
         COLUMN_METADATA_KEY,
@@ -21,11 +13,9 @@ export class EntityTransformer {
         propertyKey
       );
       if (columnMetadata) {
-        const columnName = (
-          columnMetadata.name || propertyKey.toString()
-        ).toLowerCase();
+        const columnName = columnMetadata.name || propertyKey.toString()
         entity[propertyKey] = EntityTransformer.formatValue(
-          lowerCaseValues[columnName],
+          values[columnName],
           columnMetadata.type
         );
       }

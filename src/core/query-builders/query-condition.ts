@@ -25,9 +25,9 @@ export class QueryCondition<T, K extends keyof T> {
     const mapping = this.propertyMappings.find(
       (mappingItem) => mappingItem.entityProperty === this.property
     );
-    return `${this.tableName}.${
+    return `"${this.tableName}"."${
       mapping ? mapping.columnName : String(this.property)
-    }`;
+    }"`;
   }
 
   jsonContains<P extends keyof T[K]>(
@@ -229,7 +229,7 @@ export class QueryCondition<T, K extends keyof T> {
         (mapping) => mapping.entityProperty === this.property
       )?.columnType;
     }
-
+    
     const queryBuilder = this.builder.getQueryBuilder();
     queryBuilder.internal.addValues([value], [type as LilORMType]);
     const placeholder = queryBuilder.internal

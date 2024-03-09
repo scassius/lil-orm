@@ -6,7 +6,7 @@ import {
 import { SQLBuilderImpl } from "./sql-builder-implementation";
 import { formatISO, parseISO } from "date-fns";
 
-export class PostgreSQLBuilder extends SQLBuilderImpl {
+export class PostgreSQLBuilder implements SQLBuilderImpl {
   preparedStatementPlaceholder(
     index: number,
     type: LilORMType,
@@ -35,6 +35,10 @@ export class PostgreSQLBuilder extends SQLBuilderImpl {
   }
 
   prepareValue(value: any, type: LilORMType): any {
+    if(value == null) {
+      return null;
+    }
+    
     switch (type) {
       case "boolean":
         return value;

@@ -1,8 +1,12 @@
 import { LilORMType } from "../type-maps/lil-orm-types";
 import { SQLBuilderImpl } from "./sql-builder-implementation";
 
-export class SQLiteBuilder extends SQLBuilderImpl {
-  preparedStatementPlaceholder(index: number, type: LilORMType): string {
+export class SQLiteBuilder implements SQLBuilderImpl {
+  preparedStatementPlaceholder(
+    index: number,
+    type: LilORMType,
+    value: any
+  ): string {
     return `?`;
   }
 
@@ -15,6 +19,10 @@ export class SQLiteBuilder extends SQLBuilderImpl {
   }
 
   prepareValue(value: any, type: LilORMType): any {
+    if(value == null) {
+      return null;
+    }
+
     switch (type) {
       case "boolean":
         return value ? 1 : 0;

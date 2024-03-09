@@ -39,21 +39,9 @@ export class DataAccessLayer {
         return this.database.executeNonQuery(query, values);
       });
       await Promise.all(operations);
-    } else if (queries.length === 1) {
+    } else {
       const { query, values } = queries[0].build();
       await this.database.executeNonQuery(query, values);
-    } else {
-      await this.transaction.begin();
-      try {
-        for (const queryBuilder of queries) {
-          const { query, values } = queryBuilder.build();
-          await this.database.executeNonQuery(query, values);
-        }
-        await this.transaction.commit();
-      } catch (error) {
-        await this.transaction.rollback();
-        throw error;
-      }
     }
   }
 

@@ -92,22 +92,22 @@ export class Repository<TEntity> {
       throw new Error("No entities provided for insertion.");
     }
 
-    const queries: QueryBuilderAPI[] = [];
+    const insertQuery = new QueryBuilderAPI(this.dbsm)
+    .insertInto<TEntity>(this.entityModel);
 
-    entities.forEach((entityObj) => {
-      queries.push(
-        _.cloneDeep(
-          new QueryBuilderAPI(this.dbsm)
-            .insertInto<TEntity>(this.entityModel)
-            .setObject(entityObj)
-            .finalize()
-        )
-      );
+    entities.forEach((entityObj, index) => {
+      if(index === 0) {
+        insertQuery.setObject(entityObj)
+      } else {
+        insertQuery.addValues(entityObj);
+      }
     });
 
-    this.logDebugQuery(queries);
+    const finalizedInsertQuery = insertQuery.finalize();
 
-    await this.dataAccessLayer.insert(queries, parallel);
+    this.logDebugQuery([finalizedInsertQuery]);
+
+    await this.dataAccessLayer.insert(finalizedInsertQuery, parallel);
   }
 
   public async update(
